@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TypeVehicle extends Model
+class Parking extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,16 @@ class TypeVehicle extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'type_vehicle_id',
+        'rate_id',
+        'slot_id',
+        'in_time',
+        'out_time',
+        'total_time',
+        'earned_amount',
+        'customer_id',
+        'vehicle_id',
+        'paid_status',
     ];
 
     /**
