@@ -36,4 +36,14 @@ class Parking extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function slot()
+    {
+        return $this->belongsTo('App\Models\Slot');
+    }
+
+    public function rate()
+    {
+        return $this->belongsTo('App\Models\Rate');
+    }
 }
