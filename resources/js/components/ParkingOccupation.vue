@@ -79,7 +79,8 @@ export default {
   data() {
     return {
       slot_was_occupied: null,
-      selected_class: false
+      selected_class: false,
+      slotParking: null
     }
   },
   mounted () {
@@ -90,7 +91,7 @@ export default {
       'allSlots',
       'selectSlot'
     ]),
-    slotSelect(slot) {
+    async slotSelect(slot) {
       // Validate element exists whit class no-busy
       let slotPreSelectClass = document.querySelector(`#slot_${slot.id}.not-busy`)
 
@@ -105,7 +106,7 @@ export default {
           return 0
         }
         
-        //desmarco el anterior
+        //Unamark last
         if (this.selectedSlotName && slotPreSelectClass)  {
           // previus slot unmark
           this.unMarkPrevius()
@@ -118,7 +119,23 @@ export default {
         }
       } else {
         let slotOccupied = document.querySelector(`#slot_${slot.id}.occupied`)
-        console.log(slotOccupied);
+        this.slotParking = slot.id
+
+        await axios.post('/empty-slot', {'id': slot.id, 'out_time': this.outTime()})
+          .then(resp => {
+            if (resp.data.status === 1) {
+              let slotReleased = document.querySelector(`#slot_${this.slotParking}.occupied`)
+
+              this.releasedSlot(this.slotParking)
+              // TODO Sweetalert Slot Liberado
+
+              /* Update Store Slots */
+              this.allSlots();
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          })
       }
     },
     markSlot(slot) {
@@ -130,6 +147,15 @@ export default {
       let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
       slotPreSelect.classList.remove('selected')
       slotPreSelect.classList.add('not-busy')
+    },
+    releasedSlot() {
+      let slotReles = document.querySelector(`#slot_${this.slotParking}`)
+      slotReles.classList.remove('occupied')
+      slotReles.classList.add('not-busy')
+    },
+    outTime() {
+      let CurrentDateUnixTimestamp = moment().unix()
+      return moment.unix(CurrentDateUnixTimestamp).format("YYYY-MM-DD HH:mm")
     }
   },
   computed: {

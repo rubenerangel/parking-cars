@@ -9,6 +9,8 @@ use App\Models\Parking;
 use App\Models\Customer;
 use App\Models\Vehicle;
 use App\Models\Slot;
+use Illuminate\Support\Carbon;
+use App\Http\Controllers\Api\V1\CalculateTimeController;
 
 class ParkingApiController extends Controller
 {
@@ -40,6 +42,7 @@ class ParkingApiController extends Controller
      */
     public function store(Request $request)
     {
+        /* validate get Data */
         $validateData = $request->validate([
             'documentId' => 'required',
             'in_time' => 'required',
@@ -50,11 +53,13 @@ class ParkingApiController extends Controller
             'type_vehicle_id' => 'required',
         ]);
 
+        /* Create or Update User if exists */
         $customer = Customer::updateOrCreate (
             ['documentId' => $request->documentId],
             ['name' => $request->name]
         );
 
+        /* Create or Update Vehicle if exists */
         $vehicle = Vehicle::updateOrCreate (
             ['plate' => $request->plate, 'serial' => $request->serial, 'type_vehicle_id' => $request->type_vehicle_id],
             [
@@ -63,7 +68,8 @@ class ParkingApiController extends Controller
             ]
         );
 
-        Parking::create([
+        /* Pupulate data parking */
+        $parking = Parking::create([
             'type_vehicle_id' => $request->type_vehicle_id,
             'rate_id'         => $request->rate_id,
             'slot_id'         => $request->slot_id,
@@ -72,11 +78,27 @@ class ParkingApiController extends Controller
             'in_time'         => $request->in_time,
         ]);
 
-        $slot = Slot::find($request->slot_id);
-        $slot->availability_status = 1;
-        $slot->save();
+        $parking->save();
 
-        return response()->json($request->all(), 200);
+        /* Slot now is busy */
+        $parking->slot->availability_status = 1;
+        $parking->slot->save();
+
+        if ($parking) {
+            $message = [
+                'status'    => 1,
+                'message'   => 'Slot has been Occupied'
+            ];
+            $status = 200;
+        } else {
+            $message = [
+                'status'    => 0,
+                'message'   => 'Problems Occuping Slot.'
+            ];
+            $status = 400;
+        }
+
+        return response()->json($message, $status);
     }
 
     /**
@@ -122,5 +144,53 @@ class ParkingApiController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function emptySlot(Request $request)
+    {
+        $parking = Parking::where('slot_id', $request->id)
+            ->where('paid_status', 0)
+            ->first();
+
+        /* Calculate Time and Amount*/
+        $calTime = new CalculateTimeController(
+            $parking->in_time, 
+            $request->out_time,
+            $parking->rate->rate
+        );
+        $calTime->calculateAmount();
+
+        // dd($calTime->rate);
+
+        /* Update Row */
+        $parking->out_time = $request->out_time;
+        $parking->total_time = $calTime->timeOccupied();
+        $parking->earned_amount = $calTime->rate;
+        $parking->paid_status = 1;
+
+        
+        /* Released Slot*/
+        $parking->slot->availability_status = 0;
+        $parking->slot->save();
+        
+        $parking->save();
+
+        if ($parking) {
+            $message = [
+                'status'    => 1,
+                'message'   => 'Slot released...'
+            ];
+
+            $statusResponse = 200;
+        } else {
+            $message = [
+                'status'    => 0,
+                'message'   => 'Problems in released, Please Check...'
+            ];
+
+            $status = 400;
+        }
+        
+        return response()->json($message, $statusResponse);
     }
 }
