@@ -115,6 +115,7 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2'
 import { mapState, mapGetters, mapActions } from 'vuex'
 
 import TypeVehicle from './TypeVehicle'
@@ -153,7 +154,7 @@ export default {
       e.preventDefault();
 
       // TODO validar por tipo de Vehiculo seleccionado
-      // Simular bloqueo si se selecciona carro se bloquena las demás y así
+      // Simular bloqueo si se selecciona carro se bloquena las demás and so on
 
       let parkingForm = document.getElementById('parking_form')
       let formData = new FormData(parkingForm)
@@ -174,7 +175,11 @@ export default {
             this.allSlots();
             this.resetSelected()
             this.resetData()
-            // TODO Sweetalert Slot asignado
+            Swal.fire(
+              'Slot Asignado!',
+              'Genial',
+              'success'
+            )
           }
         })
         .catch(error => {

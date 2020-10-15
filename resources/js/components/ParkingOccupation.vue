@@ -10,17 +10,17 @@
             <div class="col">
               <div class="row">
                 <div 
-                  class="col text-center cars-slots" 
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
                   v-for="(slot, index) in carsSlotsBack" 
                   :id="`slot_${slot.id}`"
                   :key="index"
                   :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
                   @click="slotSelect(slot)"
-                >{{ slot.name }}</div>
+                ><span>{{ slot.name }}</span></div>
               </div>
               <div class="row">
                 <div 
-                  class="col text-center cars-slots" 
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
                   v-for="(slot, index) in carsSlotsFront" 
                   :id="`slot_${slot.id}`"
                   :key="index"
@@ -35,7 +35,7 @@
               </div>
               <div class="row">
                 <div 
-                class="col text-center cars-slots" 
+                class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
                 v-for="(slot, index) in bicycleSlots" :key="index"
                 :class="slot.availability_status ? 'occupied' : 'not-busy'"
                 >{{ slot.name }}</div>
@@ -48,7 +48,7 @@
 
               <div class="row">
                 <div 
-                  class="col text-center cars-slots"
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center"
                   v-for="(slot, index) in MotorcycleSlotsFront" :key="index"
                   :class="slot.availability_status ? 'occupied' : 'not-busy'"
                 >{{slot.name}}</div>
@@ -56,7 +56,7 @@
 
               <div class="row">
                 <div 
-                  class="col text-center cars-slots"
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center"
                   v-for="(slot, index) in MotorcycleSlotsBack" :key="index"
                   :class="slot.availability_status ? 'occupied' : 'not-busy'"
                 >{{slot.name}}</div>
@@ -121,21 +121,41 @@ export default {
         let slotOccupied = document.querySelector(`#slot_${slot.id}.occupied`)
         this.slotParking = slot.id
 
-        await axios.post('/empty-slot', {'id': slot.id, 'out_time': this.outTime()})
-          .then(resp => {
-            if (resp.data.status === 1) {
-              let slotReleased = document.querySelector(`#slot_${this.slotParking}.occupied`)
+        Swal.fire({
+          title: 'Liberar Slot?',
+          text: "Esta acción no se puede deshacer!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, liberarlo!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post('/empty-slot', {'id': slot.id, 'out_time': this.outTime()})
+              .then(resp => {
+                if (resp.data.status === 1) {
+                  let slotReleased = document.querySelector(`#slot_${this.slotParking}.occupied`)
 
-              this.releasedSlot(this.slotParking)
-              // TODO Sweetalert Slot Liberado
+                  this.releasedSlot(this.slotParking)
+                  Swal.fire(
+                    'Slot Liberado!',
+                    'Buen trabajo',
+                    'success'
+                  )
 
-              /* Update Store Slots */
-              this.allSlots();
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          })
+                  /* Update Store Slots */
+                  this.allSlots();
+                }
+              })
+              .catch(error => {
+                console.log(error);
+              })
+          }
+        })
+
+// return false;
+
+        
       }
     },
     markSlot(slot) {
@@ -204,12 +224,17 @@ export default {
     background: #3cc16e;
     cursor: pointer;
     font-weight: 600;
+    z-index: 10;
   }
 
   .selected {
     background: rgba(0,0,255, 0.2);
     color: #fff;
     font-weight: 600;
+  }
+
+  .slots {
+    height: 4rem;
   }
 
 </style>
