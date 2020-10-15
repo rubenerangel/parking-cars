@@ -28,27 +28,12 @@ class CalculateTimeController extends Controller
         } else {
             $this->minutes = $this->in_time->diffInMinutes($this->out_time);
         }
-
-        // $timeHours = $inTime->diffInHours($out_time) . ':' . $inTime->diff($out_time)->format('%I:%S');
-        
-        // return $timeOcuppied;
     }
 
     public function timeOccupied()
     {
-
         return $occupied = $this->in_time->diffInHours($this->out_time) . ':' . $this->in_time->diff($this->out_time)->format('%I:%S');
     }
-
-    /* public function timeInMinutes($inTime, $out_time)
-    {
-        return $this->minutes = $inTime->diffInMinutes($out_time);
-    } */
-
-    /* public function timeInHours($inTime, $out_time)
-    {
-        return $this->hours = $inTime->diffInHours($out_time);
-    } */
 
     public function calculateAmount()
     {

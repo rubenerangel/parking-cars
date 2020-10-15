@@ -160,8 +160,6 @@ class ParkingApiController extends Controller
         );
         $calTime->calculateAmount();
 
-        // dd($calTime->rate);
-
         /* Update Row */
         $parking->out_time = $request->out_time;
         $parking->total_time = $calTime->timeOccupied();
