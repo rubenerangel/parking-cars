@@ -165,21 +165,33 @@ export default {
       } else {
         formData.append('slot_id', this.selectedSlotId)
       }
-
-      let CurrentDateUnixTimestamp = moment().unix()
-      formData.append('in_time', moment.unix(CurrentDateUnixTimestamp).format("YYYY-MM-DD HH:mm"))
+      
+      formData.append('in_time', this.inTime())
 
       axios.post('/parking', formData)
         .then(resp => {
-          this.allSlots();
-          
-          this.resetSelected()
+          if (resp.data.status) {
+            this.allSlots();
+            this.resetSelected()
+            this.resetData()
+            // TODO Sweetalert Slot asignado
+          }
         })
         .catch(error => {
           console.log(error)
         })
-
-      parkingForm.reset()
+    },
+    inTime() {
+      let CurrentDateUnixTimestamp = moment().unix()
+      return moment.unix(CurrentDateUnixTimestamp).format("YYYY-MM-DD HH:mm")
+    },
+    resetData() {
+      this.typeVehicles = ''
+      this.documentId = null
+      this.plate = null
+      this.serial = null
+      this.model = null
+      this.name = null
     }
   },
   computed: {
