@@ -26,5 +26,7 @@ Route::group(['prefix' => 'v1'], function() {
     Route::apiResource( 'parking', 'ParkingApiController' );
 
     Route::post( 'empty-slot', 'ParkingApiController@emptySlot' );
+
+    Route::post( 'data', 'ParkingApiController@dataSlot' );
 });
 

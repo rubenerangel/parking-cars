@@ -4,6 +4,7 @@ const slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
+    dataSlots:null
   },
   getters: {
     carsSlotsBack: state => {
@@ -34,6 +35,11 @@ const slots = {
       // state.selectedSlot.id = payLoad.id
       state.selectedSlotId = payLoad.id
       state.selectedSlotName = payLoad.name
+    },
+    DATASLOCKS(state, slotData) {
+      state.dataSlots = {
+        [slotData.slotId]: slotData
+      }
     }
   },
   actions:{
@@ -54,6 +60,10 @@ const slots = {
         name: null
       }
       commit('SELECTEDSLOT', reset)
+    },
+    dataSlocks({commit}, data ) {
+      console.log(data);
+      commit('DATASLOCKS', data)
     }
   }
 }

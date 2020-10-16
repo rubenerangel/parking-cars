@@ -15,6 +15,7 @@ class Parking extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'type_vehicle_id',
         'rate_id',
         'slot_id',
@@ -45,5 +46,15 @@ class Parking extends Model
     public function rate()
     {
         return $this->belongsTo('App\Models\Rate');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo('App\Models\Vehicle')->select(['plate', 'serial']);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Customer')->select(['documentId', 'name']);
     }
 }

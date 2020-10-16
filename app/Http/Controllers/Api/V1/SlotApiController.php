@@ -16,7 +16,11 @@ class SlotApiController extends Controller
      */
     public function index()
     {
-        return new SlotResource(Slot::all());
+        //  $slot = new Slot;
+
+        //  dd(Slot::with(['dataVehicle'])->get()->toArray()); 
+        
+        return new SlotResource(Slot::with('parking')->get());
     }
 
     /**

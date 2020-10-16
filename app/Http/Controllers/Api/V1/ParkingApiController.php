@@ -61,10 +61,11 @@ class ParkingApiController extends Controller
 
         /* Create or Update Vehicle if exists */
         $vehicle = Vehicle::updateOrCreate (
-            ['plate' => $request->plate, 'serial' => $request->serial, 'type_vehicle_id' => $request->type_vehicle_id],
+            ['plate' => $request->plate],
             [
-                'model' => $request->model,
-                'customer_id' => $customer->id,
+                'model'             => $request->model,
+                'customer_id'       => $customer->id,
+                'type_vehicle_id'   => $request->type_vehicle_id
             ]
         );
 
@@ -87,6 +88,9 @@ class ParkingApiController extends Controller
         if ($parking) {
             $message = [
                 'status'    => 1,
+                'vehicle'   => $parking->vehicle,
+                'customer'  => $parking->customer,
+                'slot'      => $parking->slot->id,
                 'message'   => 'Slot has been Occupied'
             ];
             $status = 200;
@@ -146,8 +150,70 @@ class ParkingApiController extends Controller
         //
     }
 
+    public function checkBlockedMove($id)
+    {
+        //dd($id);
+        /* Plus One to id */
+        $id++;
+
+        $slotFront = Slot::where('id', $id)
+            ->with('parking')
+            ->get();
+
+        /* If availability_status is 1 slot front is occupied */
+        if ($slotFront[0]->availability_status === 1) {
+            
+            /* Search a Slot Free */
+            $slotFree = Slot::where('availability_status', 0)
+                ->where('type_vehicle_id', $slotFront[0]->type_vehicle_id)
+                ->first();
+            
+            // $slotParking = Slot::with('parking')->get()->toArray();
+// dd($slotFree);
+            if (!empty($slotFree->id)) {
+                /* Change Id Slot in Parkings */
+                $slotFront[0]->parking->slot_id = $slotFree->id;
+                $slotFront[0]->parking->save();
+
+                /* Availability the Slot Front */
+                $slotFront[0]->availability_status = 0;
+                $slotFront[0]->save();
+
+                /* Slot Free now is Occupied */
+                $slotFree->availability_status = 1;
+                $slotFree->save();
+
+                return true;
+            } else {
+                $slotFront[0]->parking->slot_id = --$id;
+                $slotFront[0]->parking->save();
+                // dd($slotFront[0]->id );
+
+                /* Availability the Slot Front */
+                $slotFront[0]->availability_status = 0;
+                $slotFront[0]->save();
+
+                $slotFrontChange = Slot::where('id', $id)->first();
+                $slotFrontChange->availability_status = 1;
+                // dd($slotFrontChange);
+
+                /* Slot Free now is Occupied */
+                // $slotFree->availability_status = 1;
+                // $slotFree->save();
+                return true;
+            }
+
+
+
+        } 
+
+        return true;
+    }
+
     public function emptySlot(Request $request)
     {
+        
+
         $parking = Parking::where('slot_id', $request->id)
             ->where('paid_status', 0)
             ->first();
@@ -166,12 +232,14 @@ class ParkingApiController extends Controller
         $parking->earned_amount = $calTime->rate;
         $parking->paid_status = 1;
 
-        
         /* Released Slot*/
-        $parking->slot->availability_status = 0;
-        $parking->slot->save();
+        // $parking->slot->availability_status = 0;
+        // $parking->slot->save();
         
         $parking->save();
+
+        /* Check Blocked or Not */
+        $this->checkBlockedMove($request->id);
 
         if ($parking) {
             $message = [
@@ -190,5 +258,22 @@ class ParkingApiController extends Controller
         }
         
         return response()->json($message, $statusResponse);
+    }
+
+    public function dataSlot(Request $request)
+    {
+        $dataSlot = Parking::select([
+            'customers.name',
+            'customers.documentId',
+            'vehicles.plate',
+            'vehicles.serial',
+            ])
+            ->where('slot_id', $request->id)
+            ->where('paid_status', 0)
+            ->join('vehicles', 'parkings.vehicle_id', '=', 'vehicles.id')
+            ->join('customers', 'parkings.customer_id', '=', 'customers.id')
+            ->get();
+
+        return response()->json($dataSlot, 200);
     }
 }

@@ -9,6 +9,7 @@
             </div>
             <div class="col">
               <div class="row">
+
                 <div 
                   class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
                   v-for="(slot, index) in carsSlotsBack" 
@@ -16,8 +17,14 @@
                   :key="index"
                   :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
                   @click="slotSelect(slot)"
-                ><span>{{ slot.name }}</span></div>
+                > 
+                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name ">
+                    {{ slot.parking.plate }}
+                  </span>
+                  <span v-else>{{ slot.name }}</span>
+                </div>
               </div>
+              
               <div class="row">
                 <div 
                   class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
@@ -80,7 +87,10 @@ export default {
     return {
       slot_was_occupied: null,
       selected_class: false,
-      slotParking: null
+      slotParking: null,
+      slotPlate: null,
+      slotSerial: null,
+      slotNameCustomer: null,
     }
   },
   mounted () {
@@ -91,7 +101,17 @@ export default {
       'allSlots',
       'selectSlot'
     ]),
-    async slotSelect(slot) {
+    async dataVehicleCustomer(slot) {
+      var test;
+      return test = await axios.post('/data', {id: slot.id})
+        .then(resp => {
+          return resp.data.data[0].name
+        })
+
+      // console.log(test, 'test');
+      // return test.data
+    },
+    slotSelect(slot) {
       // Validate element exists whit class no-busy
       let slotPreSelectClass = document.querySelector(`#slot_${slot.id}.not-busy`)
 
@@ -152,10 +172,6 @@ export default {
               })
           }
         })
-
-// return false;
-
-        
       }
     },
     markSlot(slot) {
@@ -183,6 +199,7 @@ export default {
       theSlosts: state => state.slots.slotsParking,
       selectedSlotName: state => state.slots.selectedSlotName,
       selectedSlotId: state => state.slots.selectedSlotId,
+      dataSlot: state => state.slots.dataSlots
     }),
     ...mapGetters('slots', [
       'carsSlotsBack',
@@ -190,7 +207,20 @@ export default {
       'bicycleSlots',
       'MotorcycleSlotsBack',
       'MotorcycleSlotsFront',
-    ])
+    ]),
+    assignData() {
+      if (!this.dataSlot ){
+        return null
+      } else {
+        return this.dataSlot
+      }
+    },
+    identifyVehicle () {
+      if (this.dataSlot) {
+        let id = this.selectedSlotId
+        return this.assignData[this.slotParking].vehicle.plate
+      }
+    }
   }
 }
 </script>

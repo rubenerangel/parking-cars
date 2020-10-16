@@ -15,10 +15,10 @@ class Vehicle extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'plate',
         'serial',
         'model',
-        'customer_id',
         'customer_id',
         'type_vehicle_id',
     ];

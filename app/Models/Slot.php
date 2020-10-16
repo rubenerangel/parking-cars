@@ -15,6 +15,7 @@ class Slot extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'name',
         'availability_status',
         'type_vehicle_id',
@@ -33,6 +34,20 @@ class Slot extends Model
 
     public function parking()
     {
-        return $this->hasMany('App\Models\Parking');
+        return $this->hasOne('App\Models\Parking')
+            ->join('vehicles', 'parkings.vehicle_id', '=', 'vehicles.id')
+            ->join('customers', 'parkings.customer_id', '=', 'customers.id')
+            ->where('paid_status', 0);
+    }
+
+    public function dataVehicle()
+    {
+        return $this->hasOneThrough(
+            'App\Models\Vehicle', 
+            'App\Models\Parking',
+            'vehicle_id',
+            'id',
+            'id'
+        ) ;
     }
 }

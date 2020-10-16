@@ -142,7 +142,8 @@ export default {
     ...mapActions('slots', [
       'allSlots',
       'selectSlot',
-      'resetSelected'
+      'resetSelected',
+      'dataSlocks',
     ]),
     allTypeVehicles() {
       axios.get('/vehicles')
@@ -150,7 +151,7 @@ export default {
           this.vehicles = resp.data.data
         })
     },
-    asignSlot(e) {
+    async asignSlot(e) {
       e.preventDefault();
 
       // TODO validar por tipo de Vehiculo seleccionado
@@ -160,21 +161,29 @@ export default {
       let formData = new FormData(parkingForm)
 
       formData.append('rate_id', 1)
-
       if (!this.selectedSlotId) {
         formData.append('slot_id', this.slotsCarsNotBusy[0].id)
       } else {
         formData.append('slot_id', this.selectedSlotId)
       }
-      
       formData.append('in_time', this.inTime())
 
-      axios.post('/parking', formData)
+      await axios.post('/parking', formData)
         .then(resp => {
           if (resp.data.status) {
             this.allSlots();
-            this.resetSelected()
+            // this.resetSelected()
             this.resetData()
+            
+            /* DataSlog */
+            this.dataSlocks(
+              {
+                customer: resp.data.customer, 
+                vehicle: resp.data.vehicle, 
+                slotId: resp.data.slot
+              }
+            )
+
             Swal.fire(
               'Slot Asignado!',
               'Genial',
