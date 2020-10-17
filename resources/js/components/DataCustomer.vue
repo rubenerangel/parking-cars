@@ -67,7 +67,7 @@
                   </select>
                 </div>
                 <div class="form-group row">
-                  <label for="plate" class="col-4 text-right col-form-label">Placa:<sup class="text-danger">*</sup></label>
+                  <label for="plate" class="col-4 text-right col-form-label px-0">Placa/Serial:<sup class="text-danger">*</sup></label>
                   <div class="col">
                     <input 
                       type="text" 
@@ -78,7 +78,7 @@
                     >
                   </div>
                 </div>
-                <div class="form-group row">
+                <!--div class="form-group row">
                   <label for="serial" class="col-4 text-right col-form-label">Serial:<sup class="text-danger">*</sup></label>
                   <div class="col">
                     <input 
@@ -89,7 +89,7 @@
                       v-model="serial"
                     >
                   </div>
-                </div>
+                </div-->
                 <div class="form-group row">
                   <label for="model" class="col-4 text-right col-form-label">Modelo:<sup class="text-danger">*</sup></label>
                   <div class="col">
@@ -130,7 +130,6 @@ export default {
       vehicles: [],
       documentId: null,
       plate: null,
-      serial: null,
       model: null,
       name: null
     }
@@ -203,7 +202,6 @@ export default {
       this.typeVehicles = ''
       this.documentId = null
       this.plate = null
-      this.serial = null
       this.model = null
       this.name = null
     }

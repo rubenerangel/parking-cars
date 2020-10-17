@@ -9,7 +9,6 @@
             </div>
             <div class="col">
               <div class="row">
-
                 <div 
                   class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
                   v-for="(slot, index) in carsSlotsBack" 
@@ -18,13 +17,13 @@
                   :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
                   @click="slotSelect(slot)"
                 > 
-                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name ">
-                    {{ slot.parking.plate }}
+                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
+                    {{ slot.parking.plate  | upperCase }}
                   </span>
-                  <span v-else>{{ slot.name }}</span>
+                  <span v-else>{{ slot.name | upperCase }}</span>
                 </div>
               </div>
-              
+
               <div class="row">
                 <div 
                   class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
@@ -33,7 +32,12 @@
                   :key="index"
                   :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
                   @click="slotSelect(slot)"
-                >{{ slot.name }}</div>
+                >
+                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
+                    {{ slot.parking.plate | upperCase }}
+                  </span>
+                  <span v-else>{{ slot.name | upperCase }}</span>
+                </div>
               </div>
               <div class="row">
                 <div class="col">
@@ -43,9 +47,17 @@
               <div class="row">
                 <div 
                 class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
-                v-for="(slot, index) in bicycleSlots" :key="index"
-                :class="slot.availability_status ? 'occupied' : 'not-busy'"
-                >{{ slot.name }}</div>
+                v-for="(slot, index) in bicycleSlots" 
+                :id="`slot_${slot.id}`"
+                :key="index"
+                :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
+                @click="slotSelect(slot)"
+                >
+                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
+                    {{ slot.parking.serial | upperCase }}
+                  </span>
+                  <span v-else>{{ slot.name }}</span>
+                </div>
               </div>
               <div class="row">
                 <div class="col">
@@ -56,21 +68,36 @@
               <div class="row">
                 <div 
                   class="col text-center cars-slots slots d-flex align-items-center justify-content-center"
-                  v-for="(slot, index) in MotorcycleSlotsFront" :key="index"
-                  :class="slot.availability_status ? 'occupied' : 'not-busy'"
-                >{{slot.name}}</div>
+                  v-for="(slot, index) in MotorcycleSlotsFront" 
+                  :id="`slot_${slot.id}`"
+                  :key="index"
+                  :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
+                  @click="slotSelect(slot)"
+                >
+                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
+                    {{ slot.parking.plate | upperCase }}
+                  </span>
+                  <span v-else>{{ slot.name }}</span>
+                </div>
               </div>
 
               <div class="row">
                 <div 
                   class="col text-center cars-slots slots d-flex align-items-center justify-content-center"
-                  v-for="(slot, index) in MotorcycleSlotsBack" :key="index"
-                  :class="slot.availability_status ? 'occupied' : 'not-busy'"
-                >{{slot.name}}</div>
+                  v-for="(slot, index) in MotorcycleSlotsBack" 
+                  :id="`slot_${slot.id}`"
+                  :key="index"
+                  :class="slot.availability_status ? 'occupied' : selected_class ? 'selected' : 'not-busy'"
+                  @click="slotSelect(slot)"
+                >
+                  <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
+                    {{ slot.parking.plate | upperCase }}
+                  </span>
+                  <span v-else>{{ slot.name }}</span>
+                </div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -220,6 +247,13 @@ export default {
         let id = this.selectedSlotId
         return this.assignData[this.slotParking].vehicle.plate
       }
+    }
+  },
+  filters: {
+    upperCase(value) {
+      if ( !value ) return ''
+
+      return value.toUpperCase();
     }
   }
 }

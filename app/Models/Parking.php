@@ -50,7 +50,7 @@ class Parking extends Model
 
     public function vehicle()
     {
-        return $this->belongsTo('App\Models\Vehicle')->select(['plate', 'serial']);
+        return $this->belongsTo('App\Models\Vehicle')->select(['plate']);
     }
 
     public function customer()

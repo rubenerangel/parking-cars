@@ -55,23 +55,27 @@ class ParkingApiController extends Controller
 
         /* Create or Update User if exists */
         $customer = Customer::updateOrCreate (
-            ['documentId' => $request->documentId],
+            [
+                'documentId' => $request->documentId,
+            ],
             ['name' => $request->name]
         );
 
         /* Create or Update Vehicle if exists */
         $vehicle = Vehicle::updateOrCreate (
-            ['plate' => $request->plate],
+            [
+                'plate' => $request->plate,
+            ],
             [
                 'model'             => $request->model,
                 'customer_id'       => $customer->id,
-                'type_vehicle_id'   => $request->type_vehicle_id
+                'type_vehicle_id'   => $request->type_vehicle_id,
+                'plate'             => $request->plate,
             ]
         );
 
         /* Pupulate data parking */
         $parking = Parking::create([
-            'type_vehicle_id' => $request->type_vehicle_id,
             'rate_id'         => $request->rate_id,
             'slot_id'         => $request->slot_id,
             'customer_id'     => $customer->id,
@@ -152,7 +156,6 @@ class ParkingApiController extends Controller
 
     public function checkBlockedMove($id)
     {
-        //dd($id);
         /* Plus One to id */
         $id++;
 
@@ -168,8 +171,6 @@ class ParkingApiController extends Controller
                 ->where('type_vehicle_id', $slotFront[0]->type_vehicle_id)
                 ->first();
             
-            // $slotParking = Slot::with('parking')->get()->toArray();
-// dd($slotFree);
             if (!empty($slotFree->id)) {
                 /* Change Id Slot in Parkings */
                 $slotFront[0]->parking->slot_id = $slotFree->id;
@@ -187,7 +188,6 @@ class ParkingApiController extends Controller
             } else {
                 $slotFront[0]->parking->slot_id = --$id;
                 $slotFront[0]->parking->save();
-                // dd($slotFront[0]->id );
 
                 /* Availability the Slot Front */
                 $slotFront[0]->availability_status = 0;
@@ -195,11 +195,7 @@ class ParkingApiController extends Controller
 
                 $slotFrontChange = Slot::where('id', $id)->first();
                 $slotFrontChange->availability_status = 1;
-                // dd($slotFrontChange);
-
-                /* Slot Free now is Occupied */
-                // $slotFree->availability_status = 1;
-                // $slotFree->save();
+                
                 return true;
             }
 
@@ -212,8 +208,6 @@ class ParkingApiController extends Controller
 
     public function emptySlot(Request $request)
     {
-        
-
         $parking = Parking::where('slot_id', $request->id)
             ->where('paid_status', 0)
             ->first();
@@ -266,7 +260,6 @@ class ParkingApiController extends Controller
             'customers.name',
             'customers.documentId',
             'vehicles.plate',
-            'vehicles.serial',
             ])
             ->where('slot_id', $request->id)
             ->where('paid_status', 0)
