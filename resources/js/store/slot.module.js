@@ -4,7 +4,8 @@ const slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    dataSlots:null
+    dataSlots:null,
+    selectedSlotType: null
   },
   getters: {
     carsSlotsBack: state => {
@@ -32,7 +33,7 @@ const slots = {
       state.slotsParking = payLoad
     },
     SELECTEDSLOT(state, payLoad) {
-      // state.selectedSlot.id = payLoad.id
+      state.selectedSlotType = payLoad.type_vehicle_id
       state.selectedSlotId = payLoad.id
       state.selectedSlotName = payLoad.name
     },
@@ -44,12 +45,12 @@ const slots = {
   },
   actions:{
     async allSlots({commit}) {
-      let parkingSolts = await axios.get('/slots')
+      let parkingSlots = await axios.get('/slots')
         .then(resp => {
           return resp.data.data
         })
 
-      commit('ALLSLOTS', parkingSolts)
+      commit('ALLSLOTS', parkingSlots)
     },
     selectSlot({commit}, selectS) {
       commit('SELECTEDSLOT', selectS)

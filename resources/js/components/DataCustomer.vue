@@ -121,9 +121,6 @@ import { mapState, mapGetters, mapActions } from 'vuex'
 import TypeVehicle from './TypeVehicle'
 export default {
   name: 'DataCustomer',
-  components: {
-    TypeVehicle,
-  },
   data() {
     return {
       typeVehicles: '',
@@ -210,6 +207,12 @@ export default {
     ...mapState({
       selectedSlotName: state => state.slots.selectedSlotName,
       selectedSlotId: state => state.slots.selectedSlotId,
+      typeSlotSelected: state => state.slots.selectedSlotType,
+      typeSlotSel() {
+        if ( this.typeSlotSelected ) {
+          this.typeVehicles = this.typeSlotSelected
+        } 
+      }
     }),
     ...mapGetters('slots', [
       'slotsCarsNotBusy'
