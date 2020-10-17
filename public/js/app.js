@@ -2098,7 +2098,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   mounted: function mounted() {
     this.allTypeVehicles();
   },
-  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected', 'dataSlocks'])), {}, {
+  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected' // 'dataSlocks',
+  ])), {}, {
     allTypeVehicles: function allTypeVehicles() {
       var _this = this;
 
@@ -2132,18 +2133,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _context.next = 8;
                 return axios.post('/parking', formData).then(function (resp) {
                   if (resp.data.status) {
-                    _this2.allSlots(); // this.resetSelected()
+                    _this2.allSlots();
 
+                    _this2.resetSelected();
 
                     _this2.resetData();
                     /* DataSlog */
+                    // this.dataSlocks(
+                    //   {
+                    //     customer: resp.data.customer, 
+                    //     vehicle: resp.data.vehicle, 
+                    //     slotId: resp.data.slot
+                    //   }
+                    // )
 
-
-                    _this2.dataSlocks({
-                      customer: resp.data.customer,
-                      vehicle: resp.data.vehicle,
-                      slotId: resp.data.slot
-                    });
 
                     sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Slot Asignado!', 'Genial', 'success');
                   }
@@ -2183,7 +2186,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     typeSlotSel: function typeSlotSel() {
       if (this.typeSlotSelected) {
-        this.typeVehicles = this.typeSlotSelected;
+        return this.typeVehicles = this.typeSlotSelected;
+      } else {
+        return this.typeVehicles = '';
       }
     }
   })), Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', ['slotsCarsNotBusy'])), {}, {
@@ -2412,6 +2417,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2429,7 +2444,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   mounted: function mounted() {
     this.allSlots();
   },
-  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot'])), {}, {
+  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected'])), {}, {
     dataVehicleCustomer: function dataVehicleCustomer(slot) {
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
         var test;
@@ -2460,6 +2475,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
       // Validate element exists whit class no-busy
       var slotPreSelectClass = document.querySelector("#slot_".concat(slot.id, ".not-busy"));
+      var slotPreSelected = document.querySelector("#slot_".concat(slot.id, ".selected"));
 
       if (slotPreSelectClass) {
         if (!this.selectedSlotName && slotPreSelectClass) {
@@ -2478,6 +2494,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           this.selectSlot(slot);
           return 0;
         }
+      } else if (slotPreSelected) {
+        this.unMarkPrevius();
       } else {
         var slotOccupied = document.querySelector("#slot_".concat(slot.id, ".occupied"));
         this.slotParking = slot.id;
@@ -2521,6 +2539,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var slotPreSelect = document.querySelector("#slot_".concat(this.selectedSlotId));
       slotPreSelect.classList.remove('selected');
       slotPreSelect.classList.add('not-busy');
+      this.resetSelected();
     },
     releasedSlot: function releasedSlot() {
       var slotReles = document.querySelector("#slot_".concat(this.slotParking));
@@ -64641,7 +64660,7 @@ var render = function() {
                       {
                         key: index,
                         staticClass:
-                          "col text-center cars-slots slots d-flex align-items-center justify-content-center",
+                          "col text-center cars-slots slots d-flex align-items-center justify-content-center m-1",
                         class: slot.availability_status
                           ? "occupied"
                           : _vm.selected_class
@@ -64666,17 +64685,19 @@ var render = function() {
                                 }
                               },
                               [
-                                _vm._v(
-                                  "\n                  " +
+                                _c("small", [
+                                  _vm._v(
                                     _vm._s(
                                       _vm._f("upperCase")(slot.parking.plate)
-                                    ) +
-                                    "\n                "
-                                )
+                                    )
+                                  )
+                                ])
                               ]
                             )
                           : _c("span", [
-                              _vm._v(_vm._s(_vm._f("upperCase")(slot.name)))
+                              _c("small", [
+                                _vm._v(_vm._s(_vm._f("upperCase")(slot.name)))
+                              ])
                             ])
                       ]
                     )
@@ -64693,7 +64714,7 @@ var render = function() {
                       {
                         key: index,
                         staticClass:
-                          "col text-center cars-slots slots d-flex align-items-center justify-content-center",
+                          "col text-center cars-slots slots d-flex align-items-center justify-content-center m-1",
                         class: slot.availability_status
                           ? "occupied"
                           : _vm.selected_class
@@ -64718,17 +64739,19 @@ var render = function() {
                                 }
                               },
                               [
-                                _vm._v(
-                                  "\n                  " +
+                                _c("small", [
+                                  _vm._v(
                                     _vm._s(
                                       _vm._f("upperCase")(slot.parking.plate)
-                                    ) +
-                                    "\n                "
-                                )
+                                    )
+                                  )
+                                ])
                               ]
                             )
                           : _c("span", [
-                              _vm._v(_vm._s(_vm._f("upperCase")(slot.name)))
+                              _c("small", [
+                                _vm._v(_vm._s(_vm._f("upperCase")(slot.name)))
+                              ])
                             ])
                       ]
                     )
@@ -64747,7 +64770,7 @@ var render = function() {
                       {
                         key: index,
                         staticClass:
-                          "col text-center cars-slots slots d-flex align-items-center justify-content-center",
+                          "col text-center cars-slots slots d-flex align-items-center justify-content-center m-1",
                         class: slot.availability_status
                           ? "occupied"
                           : _vm.selected_class
@@ -64772,16 +64795,18 @@ var render = function() {
                                 }
                               },
                               [
-                                _vm._v(
-                                  "\n                  " +
+                                _c("small", [
+                                  _vm._v(
                                     _vm._s(
-                                      _vm._f("upperCase")(slot.parking.serial)
-                                    ) +
-                                    "\n                "
-                                )
+                                      _vm._f("upperCase")(slot.parking.plate)
+                                    )
+                                  )
+                                ])
                               ]
                             )
-                          : _c("span", [_vm._v(_vm._s(slot.name))])
+                          : _c("span", [
+                              _c("small", [_vm._v(_vm._s(slot.name))])
+                            ])
                       ]
                     )
                   }),
@@ -64799,7 +64824,7 @@ var render = function() {
                       {
                         key: index,
                         staticClass:
-                          "col text-center cars-slots slots d-flex align-items-center justify-content-center",
+                          "col text-center cars-slots slots d-flex align-items-center justify-content-center m-1",
                         class: slot.availability_status
                           ? "occupied"
                           : _vm.selected_class
@@ -64824,16 +64849,18 @@ var render = function() {
                                 }
                               },
                               [
-                                _vm._v(
-                                  "\n                  " +
+                                _c("small", [
+                                  _vm._v(
                                     _vm._s(
                                       _vm._f("upperCase")(slot.parking.plate)
-                                    ) +
-                                    "\n                "
-                                )
+                                    )
+                                  )
+                                ])
                               ]
                             )
-                          : _c("span", [_vm._v(_vm._s(slot.name))])
+                          : _c("span", [
+                              _c("small", [_vm._v(_vm._s(slot.name))])
+                            ])
                       ]
                     )
                   }),
@@ -64849,7 +64876,7 @@ var render = function() {
                       {
                         key: index,
                         staticClass:
-                          "col text-center cars-slots slots d-flex align-items-center justify-content-center",
+                          "col text-center cars-slots slots d-flex align-items-center justify-content-center m-1",
                         class: slot.availability_status
                           ? "occupied"
                           : _vm.selected_class
@@ -64874,16 +64901,18 @@ var render = function() {
                                 }
                               },
                               [
-                                _vm._v(
-                                  "\n                  " +
+                                _c("small", [
+                                  _vm._v(
                                     _vm._s(
                                       _vm._f("upperCase")(slot.parking.plate)
-                                    ) +
-                                    "\n                "
-                                )
+                                    )
+                                  )
+                                ])
                               ]
                             )
-                          : _c("span", [_vm._v(_vm._s(slot.name))])
+                          : _c("span", [
+                              _c("small", [_vm._v(_vm._s(slot.name))])
+                            ])
                       ]
                     )
                   }),
@@ -78920,15 +78949,13 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var slots = {
   namespaced: true,
   state: {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    dataSlots: null,
+    // dataSlots:null,
     selectedSlotType: null
   },
   getters: {
@@ -78971,10 +78998,12 @@ var slots = {
       state.selectedSlotType = payLoad.type_vehicle_id;
       state.selectedSlotId = payLoad.id;
       state.selectedSlotName = payLoad.name;
-    },
-    DATASLOCKS: function DATASLOCKS(state, slotData) {
-      state.dataSlots = _defineProperty({}, slotData.slotId, slotData);
-    }
+    } // DATASLOCKS(state, slotData) {
+    //   state.dataSlots = {
+    //     [slotData.slotId]: slotData
+    //   }
+    // }
+
   },
   actions: {
     allSlots: function allSlots(_ref) {
@@ -79010,15 +79039,15 @@ var slots = {
       var commit = _ref3.commit;
       var reset = {
         id: null,
-        name: null
+        name: null,
+        type_vehicle_id: null
       };
       commit('SELECTEDSLOT', reset);
-    },
-    dataSlocks: function dataSlocks(_ref4, data) {
-      var commit = _ref4.commit;
-      console.log(data);
-      commit('DATASLOCKS', data);
-    }
+    } // dataSlocks({commit}, data ) {
+    //   console.log(data);
+    //   commit('DATASLOCKS', data)
+    // }
+
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (slots);

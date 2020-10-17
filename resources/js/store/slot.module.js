@@ -4,7 +4,7 @@ const slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    dataSlots:null,
+    // dataSlots:null,
     selectedSlotType: null
   },
   getters: {
@@ -37,11 +37,11 @@ const slots = {
       state.selectedSlotId = payLoad.id
       state.selectedSlotName = payLoad.name
     },
-    DATASLOCKS(state, slotData) {
-      state.dataSlots = {
-        [slotData.slotId]: slotData
-      }
-    }
+    // DATASLOCKS(state, slotData) {
+    //   state.dataSlots = {
+    //     [slotData.slotId]: slotData
+    //   }
+    // }
   },
   actions:{
     async allSlots({commit}) {
@@ -58,14 +58,15 @@ const slots = {
     resetSelected({commit}) {
       const reset = {
         id: null,
-        name: null
+        name: null,
+        type_vehicle_id: null
       }
       commit('SELECTEDSLOT', reset)
     },
-    dataSlocks({commit}, data ) {
-      console.log(data);
-      commit('DATASLOCKS', data)
-    }
+    // dataSlocks({commit}, data ) {
+    //   console.log(data);
+    //   commit('DATASLOCKS', data)
+    // }
   }
 }
 

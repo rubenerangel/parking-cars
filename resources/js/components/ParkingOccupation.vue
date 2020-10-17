@@ -10,7 +10,7 @@
             <div class="col">
               <div class="row">
                 <div 
-                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center m-1" 
                   v-for="(slot, index) in carsSlotsBack" 
                   :id="`slot_${slot.id}`"
                   :key="index"
@@ -18,15 +18,17 @@
                   @click="slotSelect(slot)"
                 > 
                   <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
-                    {{ slot.parking.plate  | upperCase }}
+                    <small>{{ slot.parking.plate  | upperCase }}</small>
                   </span>
-                  <span v-else>{{ slot.name | upperCase }}</span>
+                  <span v-else>
+                    <small>{{ slot.name | upperCase }}</small>
+                  </span>
                 </div>
               </div>
 
               <div class="row">
                 <div 
-                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center m-1" 
                   v-for="(slot, index) in carsSlotsFront" 
                   :id="`slot_${slot.id}`"
                   :key="index"
@@ -34,9 +36,11 @@
                   @click="slotSelect(slot)"
                 >
                   <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
-                    {{ slot.parking.plate | upperCase }}
+                    <small>{{ slot.parking.plate | upperCase }}</small>
                   </span>
-                  <span v-else>{{ slot.name | upperCase }}</span>
+                  <span v-else>
+                    <small>{{ slot.name | upperCase }}</small>
+                  </span>
                 </div>
               </div>
               <div class="row">
@@ -46,7 +50,7 @@
               </div>
               <div class="row">
                 <div 
-                class="col text-center cars-slots slots d-flex align-items-center justify-content-center" 
+                class="col text-center cars-slots slots d-flex align-items-center justify-content-center m-1" 
                 v-for="(slot, index) in bicycleSlots" 
                 :id="`slot_${slot.id}`"
                 :key="index"
@@ -54,9 +58,11 @@
                 @click="slotSelect(slot)"
                 >
                   <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
-                    {{ slot.parking.serial | upperCase }}
+                    <small>{{ slot.parking.plate | upperCase }}</small>
                   </span>
-                  <span v-else>{{ slot.name }}</span>
+                  <span v-else>
+                    <small>{{ slot.name }}</small>
+                  </span>
                 </div>
               </div>
               <div class="row">
@@ -67,7 +73,7 @@
 
               <div class="row">
                 <div 
-                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center"
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center m-1"
                   v-for="(slot, index) in MotorcycleSlotsFront" 
                   :id="`slot_${slot.id}`"
                   :key="index"
@@ -75,15 +81,17 @@
                   @click="slotSelect(slot)"
                 >
                   <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
-                    {{ slot.parking.plate | upperCase }}
+                    <small>{{ slot.parking.plate | upperCase }}</small>
                   </span>
-                  <span v-else>{{ slot.name }}</span>
+                  <span v-else>
+                    <small>{{ slot.name }}</small>
+                  </span>
                 </div>
               </div>
 
               <div class="row">
                 <div 
-                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center"
+                  class="col text-center cars-slots slots d-flex align-items-center justify-content-center m-1"
                   v-for="(slot, index) in MotorcycleSlotsBack" 
                   :id="`slot_${slot.id}`"
                   :key="index"
@@ -91,9 +99,11 @@
                   @click="slotSelect(slot)"
                 >
                   <span v-if="slot.parking" data-toggle="tooltip" data-placement="top" :title=" slot.parking.name | upperCase">
-                    {{ slot.parking.plate | upperCase }}
+                    <small>{{ slot.parking.plate | upperCase }}</small>
                   </span>
-                  <span v-else>{{ slot.name }}</span>
+                  <span v-else>
+                    <small>{{ slot.name }}</small>
+                  </span>
                 </div>
               </div>
             </div>
@@ -126,7 +136,8 @@ export default {
   methods: {
     ...mapActions('slots', [
       'allSlots',
-      'selectSlot'
+      'selectSlot',
+      'resetSelected'
     ]),
     async dataVehicleCustomer(slot) {
       var test;
@@ -134,13 +145,11 @@ export default {
         .then(resp => {
           return resp.data.data[0].name
         })
-
-      // console.log(test, 'test');
-      // return test.data
     },
     slotSelect(slot) {
       // Validate element exists whit class no-busy
       let slotPreSelectClass = document.querySelector(`#slot_${slot.id}.not-busy`)
+      let slotPreSelected = document.querySelector(`#slot_${slot.id}.selected`)
 
       if (slotPreSelectClass) {
 
@@ -164,6 +173,8 @@ export default {
 
           return 0
         }
+      } else if (slotPreSelected) {
+        this.unMarkPrevius()
       } else {
         let slotOccupied = document.querySelector(`#slot_${slot.id}.occupied`)
         this.slotParking = slot.id
@@ -210,6 +221,7 @@ export default {
       let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
       slotPreSelect.classList.remove('selected')
       slotPreSelect.classList.add('not-busy')
+      this.resetSelected()
     },
     releasedSlot() {
       let slotReles = document.querySelector(`#slot_${this.slotParking}`)

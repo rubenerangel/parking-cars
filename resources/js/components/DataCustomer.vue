@@ -139,7 +139,7 @@ export default {
       'allSlots',
       'selectSlot',
       'resetSelected',
-      'dataSlocks',
+      // 'dataSlocks',
     ]),
     allTypeVehicles() {
       axios.get('/vehicles')
@@ -168,17 +168,17 @@ export default {
         .then(resp => {
           if (resp.data.status) {
             this.allSlots();
-            // this.resetSelected()
+            this.resetSelected()
             this.resetData()
             
             /* DataSlog */
-            this.dataSlocks(
-              {
-                customer: resp.data.customer, 
-                vehicle: resp.data.vehicle, 
-                slotId: resp.data.slot
-              }
-            )
+            // this.dataSlocks(
+            //   {
+            //     customer: resp.data.customer, 
+            //     vehicle: resp.data.vehicle, 
+            //     slotId: resp.data.slot
+            //   }
+            // )
 
             Swal.fire(
               'Slot Asignado!',
@@ -210,8 +210,10 @@ export default {
       typeSlotSelected: state => state.slots.selectedSlotType,
       typeSlotSel() {
         if ( this.typeSlotSelected ) {
-          this.typeVehicles = this.typeSlotSelected
-        } 
+          return this.typeVehicles = this.typeSlotSelected
+        } else {
+          return this.typeVehicles = ''
+        }
       }
     }),
     ...mapGetters('slots', [
