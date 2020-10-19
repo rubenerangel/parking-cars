@@ -4,7 +4,6 @@ const slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    // dataSlots:null,
     selectedSlotType: null
   },
   getters: {
@@ -23,27 +22,30 @@ const slots = {
     MotorcycleSlotsFront: state => {
       return state.slotsParking.filter(slot => slot.position % 2 === 0 && slot.type_vehicle_id === 2)
     },
-    slotsCarsNotBusy: state => {
+    slotsNotBusy: state => {
       return state.slotsParking.filter(slot => slot.type_vehicle_id === 3 && slot.availability_status === 0)
+    },
+    slotWayChange: (state) => (type) => {
+      return state.slotsParking.filter(slot =>  slot.type_vehicle_id === type  && slot.availability_status === 0 )
     }
-
   },
   mutations: {
     ALLSLOTS(state, payLoad) {
       state.slotsParking = payLoad
     },
     SELECTEDSLOT(state, payLoad) {
-      state.selectedSlotType = payLoad.type_vehicle_id
-      state.selectedSlotId = payLoad.id
-      state.selectedSlotName = payLoad.name
+      state.selectedSlotType  = payLoad.type_vehicle_id
+      state.selectedSlotId    = payLoad.id
+      state.selectedSlotName  = payLoad.name
     },
-    // DATASLOCKS(state, slotData) {
-    //   state.dataSlots = {
-    //     [slotData.slotId]: slotData
-    //   }
-    // }
+    INPUTSELECTTYPESLOT(state, payLoad) {
+      state.selectedSlotType = payLoad
+    }
   },
   actions:{
+    inputSelectTypeSlot({commit}, type) {
+      commit('INPUTSELECTTYPESLOT', type)
+    },
     async allSlots({commit}) {
       let parkingSlots = await axios.get('/slots')
         .then(resp => {
@@ -62,11 +64,7 @@ const slots = {
         type_vehicle_id: null
       }
       commit('SELECTEDSLOT', reset)
-    },
-    // dataSlocks({commit}, data ) {
-    //   console.log(data);
-    //   commit('DATASLOCKS', data)
-    // }
+    }
   }
 }
 

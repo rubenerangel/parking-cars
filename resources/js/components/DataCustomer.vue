@@ -41,13 +41,13 @@
         <div class="col">
           <div class="card">
             <div class="card-body">
-              
                 <div class="row">
                   <div class="col text-left">
                     <h4 class="card-title font-weight-bold">Vehículo</h4>
                   </div>
-                  <div class="col text-right d-flex justify-content-between" v-if="selectedSlotName">
-                    <span class="h5">Puesto:</span> <span class="h5">{{selectedSlotName}}</span>
+                  
+                  <div class="col text-right d-flex justify-content-between">
+                    <span class="h5">Puesto:</span> <span class="h5" v-if="selectedSlotName"> {{selectedSlotName}}</span>
                   </div>
                 </div>
                 <div class="form-group row pr-3">
@@ -55,8 +55,10 @@
                   <select 
                     class="form-control form-control-sm col" 
                     id="typeVehicle"
-                    v-model="typeVehicles"
+                    :value="$store.state.slots.selectedSlotType"
+                    @input="$store.commit('slots/INPUTSELECTTYPESLOT', Number($event.target.value))"
                     name="type_vehicle_id"
+                    @change="selectTypeVehicleChange()"
                   >
                     <option value="">--Seleccione--</option>
                     <option 
@@ -123,7 +125,6 @@ export default {
   name: 'DataCustomer',
   data() {
     return {
-      typeVehicles: '',
       vehicles: [],
       documentId: null,
       plate: null,
@@ -139,8 +140,9 @@ export default {
       'allSlots',
       'selectSlot',
       'resetSelected',
-      // 'dataSlocks',
+      'inputSelectTypeSlot',
     ]),
+    
     allTypeVehicles() {
       axios.get('/vehicles')
         .then(resp => {
@@ -150,15 +152,12 @@ export default {
     async asignSlot(e) {
       e.preventDefault();
 
-      // TODO validar por tipo de Vehiculo seleccionado
-      // Simular bloqueo si se selecciona carro se bloquena las demás and so on
-
       let parkingForm = document.getElementById('parking_form')
       let formData = new FormData(parkingForm)
 
       formData.append('rate_id', 1)
       if (!this.selectedSlotId) {
-        formData.append('slot_id', this.slotsCarsNotBusy[0].id)
+        formData.append('slot_id', this.slotsNotBusy[0].id)
       } else {
         formData.append('slot_id', this.selectedSlotId)
       }
@@ -171,15 +170,6 @@ export default {
             this.resetSelected()
             this.resetData()
             
-            /* DataSlog */
-            // this.dataSlocks(
-            //   {
-            //     customer: resp.data.customer, 
-            //     vehicle: resp.data.vehicle, 
-            //     slotId: resp.data.slot
-            //   }
-            // )
-
             Swal.fire(
               'Slot Asignado!',
               'Genial',
@@ -201,27 +191,31 @@ export default {
       this.plate = null
       this.model = null
       this.name = null
+    },
+    selectTypeVehicleChange() {
+      if (this.selectedSlotType) {
+        let randomSlot = this.typeSelectec[Math.floor(Math.random() * this.typeSelectec.length)];
+        this.selectSlot(randomSlot)
+
+        EventBus.$emit('selSlot', randomSlot)
+      }
     }
   },
   computed: {
     ...mapState({
       selectedSlotName: state => state.slots.selectedSlotName,
       selectedSlotId: state => state.slots.selectedSlotId,
-      typeSlotSelected: state => state.slots.selectedSlotType,
-      typeSlotSel() {
-        if ( this.typeSlotSelected ) {
-          return this.typeVehicles = this.typeSlotSelected
-        } else {
-          return this.typeVehicles = ''
-        }
+      selectedSlotType: state => state.slots.selectedSlotType,
+      wayBoard: state => state.slots.wayBoard,
+      waySelectInput: state => state.slots.waySelectInput,
+      typeSelectec() {
+        return this.slotWayChange(this.selectedSlotType)
       }
     }),
-    ...mapGetters('slots', [
-      'slotsCarsNotBusy'
-    ]),
-    slotRandomCars () {
-      return this.slotsCarsNotBusy[Math.floor(Math.random() * this.slotsCarsNotBusy.length)];
-    }
+    ...mapGetters('slots', {
+      slotsNotBusy :'slotsNotBusy',
+      slotWayChange: 'slotWayChange'
+    })
   }, 
 }
 </script>

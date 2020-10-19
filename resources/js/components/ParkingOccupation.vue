@@ -133,6 +133,11 @@ export default {
   mounted () {
     this.allSlots()
   },
+  created () {
+    EventBus.$on('selSlot', slot => {
+      this.slotSelect(slot)
+    })
+  },
   methods: {
     ...mapActions('slots', [
       'allSlots',
@@ -149,10 +154,14 @@ export default {
     slotSelect(slot) {
       // Validate element exists whit class no-busy
       let slotPreSelectClass = document.querySelector(`#slot_${slot.id}.not-busy`)
-      let slotPreSelected = document.querySelector(`#slot_${slot.id}.selected`)
+      let slotPreSelected = document.querySelector(`.selected`)
 
+      if (slotPreSelectClass && slotPreSelected) {
+        slotPreSelected.classList.remove('selected')
+
+        slotPreSelected.classList.add('not-busy')
+      }
       if (slotPreSelectClass) {
-
         if (!this.selectedSlotName && slotPreSelectClass) { 
           //mark first
           this.markSlot(slot)
@@ -162,19 +171,23 @@ export default {
           return 0
         }
         
-        //Unamark last
+        //Unmark last
         if (this.selectedSlotName && slotPreSelectClass)  {
-          // previus slot unmark
+          // previus slot unmark, with ID via State
           this.unMarkPrevius()
-          // mark new selected
+
+          // mark new selected with id via click
           this.markSlot(slot)
 
+          // To select
           this.selectSlot(slot)
 
           return 0
         }
       } else if (slotPreSelected) {
+        /* If there a Slot occupied and want released */
         this.unMarkPrevius()
+        this.resetSelected()
       } else {
         let slotOccupied = document.querySelector(`#slot_${slot.id}.occupied`)
         this.slotParking = slot.id
@@ -221,7 +234,6 @@ export default {
       let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
       slotPreSelect.classList.remove('selected')
       slotPreSelect.classList.add('not-busy')
-      this.resetSelected()
     },
     releasedSlot() {
       let slotReles = document.querySelector(`#slot_${this.slotParking}`)
@@ -238,8 +250,29 @@ export default {
       theSlosts: state => state.slots.slotsParking,
       selectedSlotName: state => state.slots.selectedSlotName,
       selectedSlotId: state => state.slots.selectedSlotId,
-      dataSlot: state => state.slots.dataSlots
+      dataSlot: state => state.slots.dataSlots,
     }),
+    /* computedUnMarkSlot() {
+      if ( this.selectedSlotId ) {
+        let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
+
+        slotPreSelect.classList.remove('selected')
+        slotPreSelect.classList.add('not-busy')
+        
+        return slotPreSelect
+      }
+    }, */
+    computedMarkSlot () {
+      /* if ( this.selectedSlotId ) {
+        // this.unMarkPrevius()
+
+        let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
+        slotPreSelect.classList.remove('not-busy')
+        slotPreSelect.classList.add('selected')
+
+        return slotPreSelect
+      } */
+    },
     ...mapGetters('slots', [
       'carsSlotsBack',
       'carsSlotsFront',
@@ -247,20 +280,8 @@ export default {
       'MotorcycleSlotsBack',
       'MotorcycleSlotsFront',
     ]),
-    assignData() {
-      if (!this.dataSlot ){
-        return null
-      } else {
-        return this.dataSlot
-      }
-    },
-    identifyVehicle () {
-      if (this.dataSlot) {
-        let id = this.selectedSlotId
-        return this.assignData[this.slotParking].vehicle.plate
-      }
-    }
   },
+  
   filters: {
     upperCase(value) {
       if ( !value ) return ''

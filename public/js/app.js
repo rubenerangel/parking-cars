@@ -2080,6 +2080,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 
 
@@ -2087,7 +2089,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   name: 'DataCustomer',
   data: function data() {
     return {
-      typeVehicles: '',
       vehicles: [],
       documentId: null,
       plate: null,
@@ -2098,8 +2099,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   mounted: function mounted() {
     this.allTypeVehicles();
   },
-  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected' // 'dataSlocks',
-  ])), {}, {
+  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected', 'inputSelectTypeSlot'])), {}, {
     allTypeVehicles: function allTypeVehicles() {
       var _this = this;
 
@@ -2116,15 +2116,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                e.preventDefault(); // TODO validar por tipo de Vehiculo seleccionado
-                // Simular bloqueo si se selecciona carro se bloquena las demás and so on
-
+                e.preventDefault();
                 parkingForm = document.getElementById('parking_form');
                 formData = new FormData(parkingForm);
                 formData.append('rate_id', 1);
 
                 if (!_this2.selectedSlotId) {
-                  formData.append('slot_id', _this2.slotsCarsNotBusy[0].id);
+                  formData.append('slot_id', _this2.slotsNotBusy[0].id);
                 } else {
                   formData.append('slot_id', _this2.selectedSlotId);
                 }
@@ -2138,15 +2136,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     _this2.resetSelected();
 
                     _this2.resetData();
-                    /* DataSlog */
-                    // this.dataSlocks(
-                    //   {
-                    //     customer: resp.data.customer, 
-                    //     vehicle: resp.data.vehicle, 
-                    //     slotId: resp.data.slot
-                    //   }
-                    // )
-
 
                     sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Slot Asignado!', 'Genial', 'success');
                   }
@@ -2172,30 +2161,38 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.plate = null;
       this.model = null;
       this.name = null;
+    },
+    selectTypeVehicleChange: function selectTypeVehicleChange() {
+      if (this.selectedSlotType) {
+        var randomSlot = this.typeSelectec[Math.floor(Math.random() * this.typeSelectec.length)];
+        this.selectSlot(randomSlot);
+        EventBus.$emit('selSlot', randomSlot);
+      }
     }
   }),
-  computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapState"])({
+  computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapState"])({
     selectedSlotName: function selectedSlotName(state) {
       return state.slots.selectedSlotName;
     },
     selectedSlotId: function selectedSlotId(state) {
       return state.slots.selectedSlotId;
     },
-    typeSlotSelected: function typeSlotSelected(state) {
+    selectedSlotType: function selectedSlotType(state) {
       return state.slots.selectedSlotType;
     },
-    typeSlotSel: function typeSlotSel() {
-      if (this.typeSlotSelected) {
-        return this.typeVehicles = this.typeSlotSelected;
-      } else {
-        return this.typeVehicles = '';
-      }
+    wayBoard: function wayBoard(state) {
+      return state.slots.wayBoard;
+    },
+    waySelectInput: function waySelectInput(state) {
+      return state.slots.waySelectInput;
+    },
+    typeSelectec: function typeSelectec() {
+      return this.slotWayChange(this.selectedSlotType);
     }
-  })), Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', ['slotsCarsNotBusy'])), {}, {
-    slotRandomCars: function slotRandomCars() {
-      return this.slotsCarsNotBusy[Math.floor(Math.random() * this.slotsCarsNotBusy.length)];
-    }
-  })
+  })), Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', {
+    slotsNotBusy: 'slotsNotBusy',
+    slotWayChange: 'slotWayChange'
+  }))
 });
 
 /***/ }),
@@ -2444,6 +2441,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   mounted: function mounted() {
     this.allSlots();
   },
+  created: function created() {
+    var _this = this;
+
+    EventBus.$on('selSlot', function (slot) {
+      _this.slotSelect(slot);
+    });
+  },
   methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected'])), {}, {
     dataVehicleCustomer: function dataVehicleCustomer(slot) {
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
@@ -2471,11 +2475,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }))();
     },
     slotSelect: function slotSelect(slot) {
-      var _this = this;
+      var _this2 = this;
 
       // Validate element exists whit class no-busy
       var slotPreSelectClass = document.querySelector("#slot_".concat(slot.id, ".not-busy"));
-      var slotPreSelected = document.querySelector("#slot_".concat(slot.id, ".selected"));
+      var slotPreSelected = document.querySelector(".selected");
+
+      if (slotPreSelectClass && slotPreSelected) {
+        slotPreSelected.classList.remove('selected');
+        slotPreSelected.classList.add('not-busy');
+      }
 
       if (slotPreSelectClass) {
         if (!this.selectedSlotName && slotPreSelectClass) {
@@ -2483,19 +2492,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           this.markSlot(slot);
           this.selectSlot(slot);
           return 0;
-        } //Unamark last
+        } //Unmark last
 
 
         if (this.selectedSlotName && slotPreSelectClass) {
-          // previus slot unmark
-          this.unMarkPrevius(); // mark new selected
+          // previus slot unmark, with ID via State
+          this.unMarkPrevius(); // mark new selected with id via click
 
-          this.markSlot(slot);
+          this.markSlot(slot); // To select
+
           this.selectSlot(slot);
           return 0;
         }
       } else if (slotPreSelected) {
+        /* If there a Slot occupied and want released */
         this.unMarkPrevius();
+        this.resetSelected();
       } else {
         var slotOccupied = document.querySelector("#slot_".concat(slot.id, ".occupied"));
         this.slotParking = slot.id;
@@ -2511,17 +2523,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           if (result.isConfirmed) {
             axios.post('/empty-slot', {
               'id': slot.id,
-              'out_time': _this.outTime()
+              'out_time': _this2.outTime()
             }).then(function (resp) {
               if (resp.data.status === 1) {
-                var slotReleased = document.querySelector("#slot_".concat(_this.slotParking, ".occupied"));
+                var slotReleased = document.querySelector("#slot_".concat(_this2.slotParking, ".occupied"));
 
-                _this.releasedSlot(_this.slotParking);
+                _this2.releasedSlot(_this2.slotParking);
 
                 sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Slot Liberado!', 'Buen trabajo', 'success');
                 /* Update Store Slots */
 
-                _this.allSlots();
+                _this2.allSlots();
               }
             })["catch"](function (error) {
               console.log(error);
@@ -2539,7 +2551,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var slotPreSelect = document.querySelector("#slot_".concat(this.selectedSlotId));
       slotPreSelect.classList.remove('selected');
       slotPreSelect.classList.add('not-busy');
-      this.resetSelected();
     },
     releasedSlot: function releasedSlot() {
       var slotReles = document.querySelector("#slot_".concat(this.slotParking));
@@ -2551,7 +2562,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return moment.unix(CurrentDateUnixTimestamp).format("YYYY-MM-DD HH:mm");
     }
   }),
-  computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapState"])({
+  computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapState"])({
     theSlosts: function theSlosts(state) {
       return state.slots.slotsParking;
     },
@@ -2564,21 +2575,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     dataSlot: function dataSlot(state) {
       return state.slots.dataSlots;
     }
-  })), Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', ['carsSlotsBack', 'carsSlotsFront', 'bicycleSlots', 'MotorcycleSlotsBack', 'MotorcycleSlotsFront'])), {}, {
-    assignData: function assignData() {
-      if (!this.dataSlot) {
-        return null;
-      } else {
-        return this.dataSlot;
+  })), {}, {
+    /* computedUnMarkSlot() {
+      if ( this.selectedSlotId ) {
+        let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
+          slotPreSelect.classList.remove('selected')
+        slotPreSelect.classList.add('not-busy')
+        
+        return slotPreSelect
       }
-    },
-    identifyVehicle: function identifyVehicle() {
-      if (this.dataSlot) {
-        var id = this.selectedSlotId;
-        return this.assignData[this.slotParking].vehicle.plate;
-      }
+    }, */
+    computedMarkSlot: function computedMarkSlot() {
+      /* if ( this.selectedSlotId ) {
+        // this.unMarkPrevius()
+          let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
+        slotPreSelect.classList.remove('not-busy')
+        slotPreSelect.classList.add('selected')
+          return slotPreSelect
+      } */
     }
-  }),
+  }, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', ['carsSlotsBack', 'carsSlotsFront', 'bicycleSlots', 'MotorcycleSlotsBack', 'MotorcycleSlotsFront'])),
   filters: {
     upperCase: function upperCase(value) {
       if (!value) return '';
@@ -64295,22 +64311,21 @@ var render = function() {
               _c("div", { staticClass: "row" }, [
                 _vm._m(2),
                 _vm._v(" "),
-                _vm.selectedSlotName
-                  ? _c(
-                      "div",
-                      {
-                        staticClass:
-                          "col text-right d-flex justify-content-between"
-                      },
-                      [
-                        _c("span", { staticClass: "h5" }, [_vm._v("Puesto:")]),
-                        _vm._v(" "),
-                        _c("span", { staticClass: "h5" }, [
-                          _vm._v(_vm._s(_vm.selectedSlotName))
+                _c(
+                  "div",
+                  {
+                    staticClass: "col text-right d-flex justify-content-between"
+                  },
+                  [
+                    _c("span", { staticClass: "h5" }, [_vm._v("Puesto:")]),
+                    _vm._v(" "),
+                    _vm.selectedSlotName
+                      ? _c("span", { staticClass: "h5" }, [
+                          _vm._v(" " + _vm._s(_vm.selectedSlotName))
                         ])
-                      ]
-                    )
-                  : _vm._e()
+                      : _vm._e()
+                  ]
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "form-group row pr-3" }, [
@@ -64319,29 +64334,20 @@ var render = function() {
                 _c(
                   "select",
                   {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.typeVehicles,
-                        expression: "typeVehicles"
-                      }
-                    ],
                     staticClass: "form-control form-control-sm col",
                     attrs: { id: "typeVehicle", name: "type_vehicle_id" },
+                    domProps: {
+                      value: _vm.$store.state.slots.selectedSlotType
+                    },
                     on: {
+                      input: function($event) {
+                        _vm.$store.commit(
+                          "slots/INPUTSELECTTYPESLOT",
+                          Number($event.target.value)
+                        )
+                      },
                       change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.typeVehicles = $event.target.multiple
-                          ? $$selectedVal
-                          : $$selectedVal[0]
+                        return _vm.selectTypeVehicleChange()
                       }
                     }
                   },
@@ -78419,6 +78425,7 @@ window.axios.defaults.baseURL = URL_API;
 window.moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 
+window.EventBus = new Vue();
 Vue.component('base-parking', __webpack_require__(/*! ./components/BaseParking.vue */ "./resources/js/components/BaseParking.vue")["default"]);
 var app = new Vue({
   el: '#app',
@@ -78955,7 +78962,6 @@ var slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    // dataSlots:null,
     selectedSlotType: null
   },
   getters: {
@@ -78984,10 +78990,17 @@ var slots = {
         return slot.position % 2 === 0 && slot.type_vehicle_id === 2;
       });
     },
-    slotsCarsNotBusy: function slotsCarsNotBusy(state) {
+    slotsNotBusy: function slotsNotBusy(state) {
       return state.slotsParking.filter(function (slot) {
         return slot.type_vehicle_id === 3 && slot.availability_status === 0;
       });
+    },
+    slotWayChange: function slotWayChange(state) {
+      return function (type) {
+        return state.slotsParking.filter(function (slot) {
+          return slot.type_vehicle_id === type && slot.availability_status === 0;
+        });
+      };
     }
   },
   mutations: {
@@ -78998,22 +79011,24 @@ var slots = {
       state.selectedSlotType = payLoad.type_vehicle_id;
       state.selectedSlotId = payLoad.id;
       state.selectedSlotName = payLoad.name;
-    } // DATASLOCKS(state, slotData) {
-    //   state.dataSlots = {
-    //     [slotData.slotId]: slotData
-    //   }
-    // }
-
+    },
+    INPUTSELECTTYPESLOT: function INPUTSELECTTYPESLOT(state, payLoad) {
+      state.selectedSlotType = payLoad;
+    }
   },
   actions: {
-    allSlots: function allSlots(_ref) {
+    inputSelectTypeSlot: function inputSelectTypeSlot(_ref, type) {
+      var commit = _ref.commit;
+      commit('INPUTSELECTTYPESLOT', type);
+    },
+    allSlots: function allSlots(_ref2) {
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
         var commit, parkingSlots;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                commit = _ref.commit;
+                commit = _ref2.commit;
                 _context.next = 3;
                 return axios.get('/slots').then(function (resp) {
                   return resp.data.data;
@@ -79031,23 +79046,19 @@ var slots = {
         }, _callee);
       }))();
     },
-    selectSlot: function selectSlot(_ref2, selectS) {
-      var commit = _ref2.commit;
+    selectSlot: function selectSlot(_ref3, selectS) {
+      var commit = _ref3.commit;
       commit('SELECTEDSLOT', selectS);
     },
-    resetSelected: function resetSelected(_ref3) {
-      var commit = _ref3.commit;
+    resetSelected: function resetSelected(_ref4) {
+      var commit = _ref4.commit;
       var reset = {
         id: null,
         name: null,
         type_vehicle_id: null
       };
       commit('SELECTEDSLOT', reset);
-    } // dataSlocks({commit}, data ) {
-    //   console.log(data);
-    //   commit('DATASLOCKS', data)
-    // }
-
+    }
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (slots);

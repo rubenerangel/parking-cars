@@ -11,6 +11,8 @@ window.Vue = require('vue');
 
 import {store} from './store/index';
 
+window.EventBus = new Vue();
+
 Vue.component('base-parking', require('./components/BaseParking.vue').default); 
 
 const app = new Vue({
