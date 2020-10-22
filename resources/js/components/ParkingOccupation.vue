@@ -176,6 +176,13 @@
               </div>
 
               <div class="col-4 text-right">
+                Tiempo tot:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ useParking.total_time }}
+              </div>
+
+              <div class="col-4 text-right">
                 Pagado:
               </div>
               <div class="col-8 px-2" v-if="useParking">

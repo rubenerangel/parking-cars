@@ -2578,6 +2578,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -65245,6 +65252,20 @@ var render = function() {
                           _vm._v(
                             "\n              " +
                               _vm._s(_vm.timeOut) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Tiempo tot:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.useParking.total_time) +
                               "\n            "
                           )
                         ])
