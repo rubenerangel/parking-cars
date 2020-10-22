@@ -40,6 +40,12 @@ class Slot extends Model
             ->where('paid_status', 0);
     }
 
+    public function parkingSlot()
+    {
+        return $this->hasOne('App\Models\Parking')
+            ->where('paid_status', 0);
+    }
+
     public function dataVehicle()
     {
         return $this->hasOneThrough(

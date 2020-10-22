@@ -50,11 +50,11 @@ class Parking extends Model
 
     public function vehicle()
     {
-        return $this->belongsTo('App\Models\Vehicle')->select(['plate']);
+        return $this->belongsTo('App\Models\Vehicle');
     }
 
     public function customer()
     {
-        return $this->belongsTo('App\Models\Customer')->select(['documentId', 'name']);
+        return $this->belongsTo('App\Models\Customer');
     }
 }

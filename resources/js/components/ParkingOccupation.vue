@@ -111,6 +111,99 @@
         </div>
       </div>
     </div>
+   
+
+    <!-- Modal -->
+    <div class="modal fade" id="bill" tabindex="-1" role="dialog" aria-labelledby="bill" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="bill">Factura</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-4 text-right">
+                Cliente:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ useParking.customer.name }}
+              </div>
+
+              <div class="col-4 text-right">
+                Doc ID:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ useParking.customer.documentId }}
+              </div>
+
+              <div class="col-12">
+                <hr class="hr" />
+              </div>
+
+              <div class="col-4 text-right">
+                Placa/Serial: 
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ useParking.vehicle.plate }}
+              </div>
+
+              <div class="col-4 text-right">
+                Modelo:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ useParking.vehicle.model }}
+              </div>
+
+              <div class="col-12">
+                <hr class="hr" />
+              </div>
+
+              <div class="col-4 text-right">
+                Entrada:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ timeIn }}
+              </div>
+
+              <div class="col-4 text-right">
+                Salida:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ timeOut }}
+              </div>
+
+              <div class="col-4 text-right">
+                Pagado:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ paidStatus }}
+              </div>
+
+              <div class="col-4 text-right">
+                Tarifa:
+              </div>
+              <div class="col-8 px-2" v-if="useParking">
+                {{ useParking.rate.rate }}
+              </div>
+
+              <div class="col-4 text-right">
+                Total:
+              </div>
+              <div class="col-5 px-2 text-right" v-if="useParking">
+                <h4>{{ useParking.earned_amount}}</h4>
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -122,12 +215,9 @@ export default {
   name: 'ParkingOccupation',
   data() {
     return {
-      slot_was_occupied: null,
       selected_class: false,
       slotParking: null,
-      slotPlate: null,
-      slotSerial: null,
-      slotNameCustomer: null,
+      useParking: null
     }
   },
   mounted () {
@@ -188,7 +278,7 @@ export default {
         /* If there a Slot occupied and want released */
         this.unMarkPrevius()
         this.resetSelected()
-      } else {
+      } else { // Released Slot
         let slotOccupied = document.querySelector(`#slot_${slot.id}.occupied`)
         this.slotParking = slot.id
 
@@ -205,6 +295,9 @@ export default {
             axios.post('/empty-slot', {'id': slot.id, 'out_time': this.outTime()})
               .then(resp => {
                 if (resp.data.status === 1) {
+                  console.log(resp.data.parking);
+                  this.useParking = resp.data.parking
+                  $('#bill').modal('show')
                   let slotReleased = document.querySelector(`#slot_${this.slotParking}.occupied`)
 
                   this.releasedSlot(this.slotParking)
@@ -215,6 +308,7 @@ export default {
                   )
 
                   /* Update Store Slots */
+                  this.allSlots();
                   this.allSlots();
                 }
               })
@@ -252,6 +346,16 @@ export default {
       selectedSlotId: state => state.slots.selectedSlotId,
       dataSlot: state => state.slots.dataSlots,
     }),
+    paidStatus() {
+      return this.useParking.paid_status ? 'Sí' : 'No'
+    },
+    timeIn() {
+      return moment(this.useParking.in_time).format('DD/MM/YYYY HH:mm')
+    },
+    timeOut() {
+      return moment(this.useParking.out_time).format('DD/MM/YYYY HH:mm')
+    },
+
     /* computedUnMarkSlot() {
       if ( this.selectedSlotId ) {
         let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)

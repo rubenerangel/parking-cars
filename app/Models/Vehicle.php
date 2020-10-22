@@ -31,4 +31,9 @@ class Vehicle extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Customer');
+    }
 }

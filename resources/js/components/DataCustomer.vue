@@ -5,10 +5,9 @@
         <div class="col">
           <div class="card">
             <div class="card-body">
-              
                 <h4 class="card-title font-weight-bold">Cliente</h4>
-                <div class="form-group row">
-                  <label for="staticEmail" class="col-4 text-right col-form-label">Documento:<sup class="text-danger">*</sup></label>
+                <div class="form-group row mb-0">
+                  <label for="staticEmail" class="col-4 text-right col-form-label pb-0">Documento:<sup class="text-danger">*</sup></label>
                   <div class="col">
                     <input 
                       type="text" 
@@ -19,8 +18,13 @@
                     >
                   </div>
                 </div>
-                <div class="form-group row">
-                  <label for="staticEmail" class="col-4 text-right col-form-label">Nombre:<sup class="text-danger">*</sup></label>
+
+                <div class="row" v-if="error && error.document">
+                  <small class="col offset-4 text-danger">{{ error.document }}</small>
+                </div>
+                
+                <div class="form-group row mb-0 mt-2">
+                  <label for="staticEmail" class="col-4 text-right col-form-label pb-0">Nombre:<sup class="text-danger">*</sup></label>
                   <div class="col">
                     <input 
                       type="text" 
@@ -30,6 +34,10 @@
                       v-model="name"
                     >
                   </div>
+                </div>
+
+                <div class="row" v-if="error && error.name">
+                    <small  class="col offset-4 text-danger">{{ error.name }}</small>
                 </div>
               
             </div>
@@ -50,8 +58,8 @@
                     <span class="h5">Puesto:</span> <span class="h5" v-if="selectedSlotName"> {{selectedSlotName}}</span>
                   </div>
                 </div>
-                <div class="form-group row pr-3">
-                  <label for="typeVehicle" class="col-5">Tipo vehículo:<sup class="text-danger">*</sup></label>
+                <div class="form-group row pr-3 mb-0">
+                  <label for="typeVehicle" class="col-5 pb-0 pr-4 text-right">Tipo vehículo:<sup class="text-danger">*</sup></label>
                   <select 
                     class="form-control form-control-sm col" 
                     id="typeVehicle"
@@ -68,8 +76,13 @@
                     >{{ vehicle.name }}</option>
                   </select>
                 </div>
-                <div class="form-group row">
-                  <label for="plate" class="col-4 text-right col-form-label px-0">Placa/Serial:<sup class="text-danger">*</sup></label>
+
+                <div class="row" v-if="error && error.typeVehicle">
+                  <small  class="col offset-4 text-danger">{{ error.typeVehicle }}</small>
+                </div>
+
+                <div class="form-group row mb-0 mt-2">
+                  <label for="plate" class="col-4 text-right col-form-label px-0 pb-0">Placa/Serial:<sup class="text-danger">*</sup></label>
                   <div class="col">
                     <input 
                       type="text" 
@@ -79,6 +92,10 @@
                       v-model="plate"
                     >
                   </div>
+                </div>
+
+                <div class="row" v-if="error && error.plate">
+                  <small  class="col offset-4 text-danger">{{ error.plate }}</small>
                 </div>
                 <!--div class="form-group row">
                   <label for="serial" class="col-4 text-right col-form-label">Serial:<sup class="text-danger">*</sup></label>
@@ -92,8 +109,8 @@
                     >
                   </div>
                 </div-->
-                <div class="form-group row">
-                  <label for="model" class="col-4 text-right col-form-label">Modelo:<sup class="text-danger">*</sup></label>
+                <div class="form-group row mb-0 mt-2">
+                  <label for="model" class="col-4 text-right col-form-label pb-0 px-0">Modelo:<sup class="text-danger">*</sup></label>
                   <div class="col">
                     <input 
                       type="text" 
@@ -104,7 +121,12 @@
                       >
                   </div>
                 </div>
-                <div class="row">
+
+                <div class="row" v-if="error && error.model">
+                  <small  class="col offset-4 text-danger">{{ error.model }}</small>
+                </div>
+
+                <div class="row mt-3">
                   <button class="btn btn-success btn-sm mx-auto" @click="asignSlot($event)">Asignar</button>
                 </div>
               
@@ -129,7 +151,14 @@ export default {
       documentId: null,
       plate: null,
       model: null,
-      name: null
+      name: null,
+      error: {
+        document: null,
+        name: null,
+        typeVehicle: null,
+        plate: null,
+        model: null
+      }
     }
   },
   mounted () {
@@ -149,8 +178,34 @@ export default {
           this.vehicles = resp.data.data
         })
     },
+    validateForm() {
+      this.error = {}
+
+      if (!this.documentId) {
+        this.error.document = 'El documento es Requerido!'
+      }
+      if (!this.name) {
+        this.error.name = 'El Nombre del Cliente es requerido!'
+      }
+      if (!this.selectedSlotType) {
+        this.error.typeVehicle = 'El Tipo de Vehiculo es requerido!'
+      }
+      if (!this.plate) {
+        this.error.plate = 'La placa es requerida!'
+      }
+      if (!this.model) {
+        this.error.model = 'El modelo es requerido!'
+      }
+
+      if (Object.keys(this.error).length > 0) {
+        return false
+      } else {
+        return true
+      }
+    },
     async asignSlot(e) {
       e.preventDefault();
+      if (!this.validateForm()) return false
 
       let parkingForm = document.getElementById('parking_form')
       let formData = new FormData(parkingForm)
@@ -166,10 +221,10 @@ export default {
       await axios.post('/parking', formData)
         .then(resp => {
           if (resp.data.status) {
-            this.allSlots();
-            this.resetSelected()
             this.resetData()
-            
+            this.resetSelected()
+            this.allSlots();
+
             Swal.fire(
               'Slot Asignado!',
               'Genial',
@@ -186,11 +241,11 @@ export default {
       return moment.unix(CurrentDateUnixTimestamp).format("YYYY-MM-DD HH:mm")
     },
     resetData() {
-      this.typeVehicles = ''
       this.documentId = null
       this.plate = null
       this.model = null
       this.name = null
+      this.error = {}
     },
     selectTypeVehicleChange() {
       if (this.selectedSlotType) {
@@ -206,8 +261,6 @@ export default {
       selectedSlotName: state => state.slots.selectedSlotName,
       selectedSlotId: state => state.slots.selectedSlotId,
       selectedSlotType: state => state.slots.selectedSlotType,
-      wayBoard: state => state.slots.wayBoard,
-      waySelectInput: state => state.slots.waySelectInput,
       typeSelectec() {
         return this.slotWayChange(this.selectedSlotType)
       }

@@ -157,50 +157,62 @@ class ParkingApiController extends Controller
     public function checkBlockedMove($id)
     {
         /* Plus One to id */
-        $id++;
+        $idAux = $id + 1; 
 
-        $slotFront = Slot::where('id', $id)
-            ->with('parking')
-            ->get();
+        $slotFront = Slot::find($idAux);
 
         /* If availability_status is 1 slot front is occupied */
-        if ($slotFront[0]->availability_status === 1) {
+        if ($slotFront->availability_status === 1) {
             
             /* Search a Slot Free */
             $slotFree = Slot::where('availability_status', 0)
-                ->where('type_vehicle_id', $slotFront[0]->type_vehicle_id)
+                ->where('type_vehicle_id', $slotFront->type_vehicle_id)
                 ->first();
-            
-            if (!empty($slotFree->id)) {
+
+            if (!empty($slotFree->id)) {  // Board Not is full  
                 /* Change Id Slot in Parkings */
-                $slotFront[0]->parking->slot_id = $slotFree->id;
-                $slotFront[0]->parking->save();
+                $slotFront->parkingSlot->slot_id = $slotFree->id;
+                $slotFront->push();
 
                 /* Availability the Slot Front */
-                $slotFront[0]->availability_status = 0;
-                $slotFront[0]->save();
+                $slotFront->availability_status = 0;
+                $slotFront->push();
 
                 /* Slot Free now is Occupied */
                 $slotFree->availability_status = 1;
                 $slotFree->save();
 
                 return true;
-            } else {
-                $slotFront[0]->parking->slot_id = --$id;
-                $slotFront[0]->parking->save();
+            } else { // Board Is full
+                /* Availability the Slot Front */
+                $slotFront->availability_status = 0;
+                $slotFront->push();
+
+                // dd($slotClick->parkingSlot);
+                
+                $slotFront->parkingSlot->slot_id = $id;
+                $slotFront->push();
+                
+                // dd($slotFront->parkingSlot); 
+                /* $slotClick = Slot::find($id);
+
+                dd($slotClick->parkingSlot); */
 
                 /* Availability the Slot Front */
-                $slotFront[0]->availability_status = 0;
-                $slotFront[0]->save();
+                /* $slotFront->availability_status = 0;
+                $slotFront->push(); */
 
-                $slotFrontChange = Slot::where('id', $id)->first();
-                $slotFrontChange->availability_status = 1;
+               /*  $slotFront->parkingSlot->slot_id = --$id;
+                $slotFront->push(); */
+
+
+
+
+                /* $slotFrontChange = Slot::where('id', $id)->first();
+                $slotFrontChange->availability_status = 1; */
                 
                 return true;
             }
-
-
-
         } 
 
         return true;
@@ -208,9 +220,18 @@ class ParkingApiController extends Controller
 
     public function emptySlot(Request $request)
     {
-        $parking = Parking::where('slot_id', $request->id)
+        
+        $parking = Parking::with(
+            [
+                'slot', 
+                'vehicle', 
+                'customer'
+            ])
+            ->where('slot_id', $request->id)
             ->where('paid_status', 0)
             ->first();
+
+        // dd($parking);
 
         /* Calculate Time and Amount*/
         $calTime = new CalculateTimeController(
@@ -225,20 +246,24 @@ class ParkingApiController extends Controller
         $parking->total_time = $calTime->timeOccupied();
         $parking->earned_amount = $calTime->rate;
         $parking->paid_status = 1;
-
-        /* Released Slot*/
-        // $parking->slot->availability_status = 0;
-        // $parking->slot->save();
+        // $parking->slot_id = ;
+        
+        /* Check Blocked or Not */
+        $this->checkBlockedMove($request->id);
         
         $parking->save();
 
-        /* Check Blocked or Not */
-        $this->checkBlockedMove($request->id);
+        // $parking->with(['vehicle', 'customer']);
 
-        if ($parking) {
+        /* Released Slot */
+        /* $parking->slot->availability_status = 0;
+        $parking->slot->save(); */
+
+        if ($parking && $parking->slot) {
             $message = [
                 'status'    => 1,
-                'message'   => 'Slot released...'
+                'message'   => 'Slot released...',
+                'parking'   => $parking
             ];
 
             $statusResponse = 200;

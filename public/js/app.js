@@ -2082,6 +2082,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2093,7 +2115,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       documentId: null,
       plate: null,
       model: null,
-      name: null
+      name: null,
+      error: {
+        document: null,
+        name: null,
+        typeVehicle: null,
+        plate: null,
+        model: null
+      }
     };
   },
   mounted: function mounted() {
@@ -2107,6 +2136,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         _this.vehicles = resp.data.data;
       });
     },
+    validateForm: function validateForm() {
+      this.error = {};
+
+      if (!this.documentId) {
+        this.error.document = 'El documento es Requerido!';
+      }
+
+      if (!this.name) {
+        this.error.name = 'El Nombre del Cliente es requerido!';
+      }
+
+      if (!this.selectedSlotType) {
+        this.error.typeVehicle = 'El Tipo de Vehiculo es requerido!';
+      }
+
+      if (!this.plate) {
+        this.error.plate = 'La placa es requerida!';
+      }
+
+      if (!this.model) {
+        this.error.model = 'El modelo es requerido!';
+      }
+
+      if (Object.keys(this.error).length > 0) {
+        return false;
+      } else {
+        return true;
+      }
+    },
     asignSlot: function asignSlot(e) {
       var _this2 = this;
 
@@ -2117,6 +2175,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context.prev = _context.next) {
               case 0:
                 e.preventDefault();
+
+                if (_this2.validateForm()) {
+                  _context.next = 3;
+                  break;
+                }
+
+                return _context.abrupt("return", false);
+
+              case 3:
                 parkingForm = document.getElementById('parking_form');
                 formData = new FormData(parkingForm);
                 formData.append('rate_id', 1);
@@ -2128,14 +2195,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 formData.append('in_time', _this2.inTime());
-                _context.next = 8;
+                _context.next = 10;
                 return axios.post('/parking', formData).then(function (resp) {
                   if (resp.data.status) {
-                    _this2.allSlots();
+                    _this2.resetData();
 
                     _this2.resetSelected();
 
-                    _this2.resetData();
+                    _this2.allSlots();
 
                     sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Slot Asignado!', 'Genial', 'success');
                   }
@@ -2143,7 +2210,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   console.log(error);
                 });
 
-              case 8:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -2156,11 +2223,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return moment.unix(CurrentDateUnixTimestamp).format("YYYY-MM-DD HH:mm");
     },
     resetData: function resetData() {
-      this.typeVehicles = '';
       this.documentId = null;
       this.plate = null;
       this.model = null;
       this.name = null;
+      this.error = {};
     },
     selectTypeVehicleChange: function selectTypeVehicleChange() {
       if (this.selectedSlotType) {
@@ -2179,12 +2246,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     selectedSlotType: function selectedSlotType(state) {
       return state.slots.selectedSlotType;
-    },
-    wayBoard: function wayBoard(state) {
-      return state.slots.wayBoard;
-    },
-    waySelectInput: function waySelectInput(state) {
-      return state.slots.waySelectInput;
     },
     typeSelectec: function typeSelectec() {
       return this.slotWayChange(this.selectedSlotType);
@@ -2424,18 +2485,108 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'ParkingOccupation',
   data: function data() {
     return {
-      slot_was_occupied: null,
       selected_class: false,
       slotParking: null,
-      slotPlate: null,
-      slotSerial: null,
-      slotNameCustomer: null
+      useParking: null
     };
   },
   mounted: function mounted() {
@@ -2509,6 +2660,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.unMarkPrevius();
         this.resetSelected();
       } else {
+        // Released Slot
         var slotOccupied = document.querySelector("#slot_".concat(slot.id, ".occupied"));
         this.slotParking = slot.id;
         sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire({
@@ -2526,12 +2678,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               'out_time': _this2.outTime()
             }).then(function (resp) {
               if (resp.data.status === 1) {
+                console.log(resp.data.parking);
+                _this2.useParking = resp.data.parking;
+                $('#bill').modal('show');
                 var slotReleased = document.querySelector("#slot_".concat(_this2.slotParking, ".occupied"));
 
                 _this2.releasedSlot(_this2.slotParking);
 
                 sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Slot Liberado!', 'Buen trabajo', 'success');
                 /* Update Store Slots */
+
+                _this2.allSlots();
 
                 _this2.allSlots();
               }
@@ -2576,6 +2733,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return state.slots.dataSlots;
     }
   })), {}, {
+    paidStatus: function paidStatus() {
+      return this.useParking.paid_status ? 'Sí' : 'No';
+    },
+    timeIn: function timeIn() {
+      return moment(this.useParking.in_time).format('DD/MM/YYYY HH:mm');
+    },
+    timeOut: function timeOut() {
+      return moment(this.useParking.out_time).format('DD/MM/YYYY HH:mm');
+    },
+
     /* computedUnMarkSlot() {
       if ( this.selectedSlotId ) {
         let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
@@ -64240,7 +64407,7 @@ var render = function() {
                 _vm._v("Cliente")
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "form-group row" }, [
+              _c("div", { staticClass: "form-group row mb-0" }, [
                 _vm._m(0),
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
@@ -64272,7 +64439,15 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "form-group row" }, [
+              _vm.error && _vm.error.document
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "col offset-4 text-danger" }, [
+                      _vm._v(_vm._s(_vm.error.document))
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group row mb-0 mt-2" }, [
                 _vm._m(1),
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
@@ -64298,7 +64473,15 @@ var render = function() {
                     }
                   })
                 ])
-              ])
+              ]),
+              _vm._v(" "),
+              _vm.error && _vm.error.name
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "col offset-4 text-danger" }, [
+                      _vm._v(_vm._s(_vm.error.name))
+                    ])
+                  ])
+                : _vm._e()
             ])
           ])
         ])
@@ -64328,7 +64511,7 @@ var render = function() {
                 )
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "form-group row pr-3" }, [
+              _c("div", { staticClass: "form-group row pr-3 mb-0" }, [
                 _vm._m(3),
                 _vm._v(" "),
                 _c(
@@ -64368,7 +64551,15 @@ var render = function() {
                 )
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "form-group row" }, [
+              _vm.error && _vm.error.typeVehicle
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "col offset-4 text-danger" }, [
+                      _vm._v(_vm._s(_vm.error.typeVehicle))
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group row mb-0 mt-2" }, [
                 _vm._m(4),
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
@@ -64396,7 +64587,15 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "form-group row" }, [
+              _vm.error && _vm.error.plate
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "col offset-4 text-danger" }, [
+                      _vm._v(_vm._s(_vm.error.plate))
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group row mb-0 mt-2" }, [
                 _vm._m(5),
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
@@ -64424,7 +64623,15 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "row" }, [
+              _vm.error && _vm.error.model
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "col offset-4 text-danger" }, [
+                      _vm._v(_vm._s(_vm.error.model))
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("div", { staticClass: "row mt-3" }, [
                 _c(
                   "button",
                   {
@@ -64453,7 +64660,7 @@ var staticRenderFns = [
     return _c(
       "label",
       {
-        staticClass: "col-4 text-right col-form-label",
+        staticClass: "col-4 text-right col-form-label pb-0",
         attrs: { for: "staticEmail" }
       },
       [
@@ -64469,7 +64676,7 @@ var staticRenderFns = [
     return _c(
       "label",
       {
-        staticClass: "col-4 text-right col-form-label",
+        staticClass: "col-4 text-right col-form-label pb-0",
         attrs: { for: "staticEmail" }
       },
       [
@@ -64494,7 +64701,10 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c(
       "label",
-      { staticClass: "col-5", attrs: { for: "typeVehicle" } },
+      {
+        staticClass: "col-5 pb-0 pr-4 text-right",
+        attrs: { for: "typeVehicle" }
+      },
       [
         _vm._v("Tipo vehículo:"),
         _c("sup", { staticClass: "text-danger" }, [_vm._v("*")])
@@ -64508,7 +64718,7 @@ var staticRenderFns = [
     return _c(
       "label",
       {
-        staticClass: "col-4 text-right col-form-label px-0",
+        staticClass: "col-4 text-right col-form-label px-0 pb-0",
         attrs: { for: "plate" }
       },
       [
@@ -64524,7 +64734,7 @@ var staticRenderFns = [
     return _c(
       "label",
       {
-        staticClass: "col-4 text-right col-form-label",
+        staticClass: "col-4 text-right col-form-label pb-0 px-0",
         attrs: { for: "model" }
       },
       [
@@ -64928,7 +65138,166 @@ var render = function() {
             ])
           ])
         ])
-      ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "bill",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "bill",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(2),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Cliente:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.useParking.customer.name) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Doc ID:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.useParking.customer.documentId) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm._m(3),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Placa/Serial: \n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.useParking.vehicle.plate) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Modelo:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.useParking.vehicle.model) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm._m(4),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Entrada:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.timeIn) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Salida:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.timeOut) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Pagado:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.paidStatus) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Tarifa:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.useParking.rate.rate) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-4 text-right" }, [
+                      _vm._v("\n              Total:\n            ")
+                    ]),
+                    _vm._v(" "),
+                    _vm.useParking
+                      ? _c("div", { staticClass: "col-5 px-2 text-right" }, [
+                          _c("h4", [
+                            _vm._v(_vm._s(_vm.useParking.earned_amount))
+                          ])
+                        ])
+                      : _vm._e()
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(5)
+              ])
+            ]
+          )
+        ]
+      )
     ]
   )
 }
@@ -64951,6 +65320,60 @@ var staticRenderFns = [
       _c("div", { staticClass: "col" }, [
         _vm._v("\n                -->\n              ")
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c("h5", { staticClass: "modal-title", attrs: { id: "bill" } }, [
+        _vm._v("Factura")
+      ]),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-12" }, [
+      _c("hr", { staticClass: "hr" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-12" }, [
+      _c("hr", { staticClass: "hr" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-footer" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-secondary",
+          attrs: { type: "button", "data-dismiss": "modal" }
+        },
+        [_vm._v("Close")]
+      )
     ])
   }
 ]
