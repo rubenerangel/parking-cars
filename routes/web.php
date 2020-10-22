@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('parking');
+    return view('board');
 });
 
-// Route::resources(['slots' => SlotController::class]);
+Route::resource('/discounts', 'DiscountController');
+
