@@ -15,11 +15,10 @@ class Reduction extends Model
      * @var array
      */
     protected $fillable = [
-        
         'name',
         'percentage',
         'time',
-        
+        'active',
     ];
 
     /**
@@ -30,5 +29,6 @@ class Reduction extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'percentage' => 'float',
     ];
 }

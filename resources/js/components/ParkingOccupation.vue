@@ -196,6 +196,15 @@
                 {{ useParking.rate.rate }}
               </div>
 
+              
+                <div class="col-4 text-right" v-if="percentage">
+                  <span>Descuento:</span> 
+                </div>
+                <div class="col-8 px-2" v-if="percentage">
+                  {{ percentage }} %
+                </div>
+              
+
               <div class="col-4 text-right">
                 Total:
               </div>
@@ -224,7 +233,8 @@ export default {
     return {
       selected_class: false,
       slotParking: null,
-      useParking: null
+      useParking: null,
+      percentage: null
     }
   },
   mounted () {
@@ -304,6 +314,7 @@ export default {
                 if (resp.data.status === 1) {
                   console.log(resp.data.parking);
                   this.useParking = resp.data.parking
+                  this.percentage = resp.data.percentage
                   $('#bill').modal('show')
                   let slotReleased = document.querySelector(`#slot_${this.slotParking}.occupied`)
 
@@ -361,28 +372,6 @@ export default {
     },
     timeOut() {
       return moment(this.useParking.out_time).format('DD/MM/YYYY HH:mm')
-    },
-
-    /* computedUnMarkSlot() {
-      if ( this.selectedSlotId ) {
-        let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
-
-        slotPreSelect.classList.remove('selected')
-        slotPreSelect.classList.add('not-busy')
-        
-        return slotPreSelect
-      }
-    }, */
-    computedMarkSlot () {
-      /* if ( this.selectedSlotId ) {
-        // this.unMarkPrevius()
-
-        let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
-        slotPreSelect.classList.remove('not-busy')
-        slotPreSelect.classList.add('selected')
-
-        return slotPreSelect
-      } */
     },
     ...mapGetters('slots', [
       'carsSlotsBack',

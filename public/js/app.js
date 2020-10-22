@@ -2585,6 +2585,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2593,7 +2602,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return {
       selected_class: false,
       slotParking: null,
-      useParking: null
+      useParking: null,
+      percentage: null
     };
   },
   mounted: function mounted() {
@@ -2687,6 +2697,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               if (resp.data.status === 1) {
                 console.log(resp.data.parking);
                 _this2.useParking = resp.data.parking;
+                _this2.percentage = resp.data.percentage;
                 $('#bill').modal('show');
                 var slotReleased = document.querySelector("#slot_".concat(_this2.slotParking, ".occupied"));
 
@@ -2748,25 +2759,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     timeOut: function timeOut() {
       return moment(this.useParking.out_time).format('DD/MM/YYYY HH:mm');
-    },
-
-    /* computedUnMarkSlot() {
-      if ( this.selectedSlotId ) {
-        let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
-          slotPreSelect.classList.remove('selected')
-        slotPreSelect.classList.add('not-busy')
-        
-        return slotPreSelect
-      }
-    }, */
-    computedMarkSlot: function computedMarkSlot() {
-      /* if ( this.selectedSlotId ) {
-        // this.unMarkPrevius()
-          let slotPreSelect = document.querySelector(`#slot_${this.selectedSlotId}`)
-        slotPreSelect.classList.remove('not-busy')
-        slotPreSelect.classList.add('selected')
-          return slotPreSelect
-      } */
     }
   }, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', ['carsSlotsBack', 'carsSlotsFront', 'bicycleSlots', 'MotorcycleSlotsBack', 'MotorcycleSlotsFront'])),
   filters: {
@@ -65295,6 +65287,22 @@ var render = function() {
                             "\n              " +
                               _vm._s(_vm.useParking.rate.rate) +
                               "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.percentage
+                      ? _c("div", { staticClass: "col-4 text-right" }, [
+                          _c("span", [_vm._v("Descuento:")])
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.percentage
+                      ? _c("div", { staticClass: "col-8 px-2" }, [
+                          _vm._v(
+                            "\n                " +
+                              _vm._s(_vm.percentage) +
+                              " %\n              "
                           )
                         ])
                       : _vm._e(),

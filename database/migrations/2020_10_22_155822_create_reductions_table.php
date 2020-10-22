@@ -17,7 +17,8 @@ class CreateReductionsTable extends Migration
             $table->id();
             $table->string('name', 100);
             $table->decimal('percentage', 8,2)->default(0);
-            $table->time('time', 0);
+            $table->string('time', 20);
+            $table->boolean('active')->default(1);
             $table->timestamps();
         });
     }

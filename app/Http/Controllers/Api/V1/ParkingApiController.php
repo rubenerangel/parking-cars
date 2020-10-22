@@ -193,24 +193,6 @@ class ParkingApiController extends Controller
                 $slotFront->parkingSlot->slot_id = $id;
                 $slotFront->push();
                 
-                // dd($slotFront->parkingSlot); 
-                /* $slotClick = Slot::find($id);
-
-                dd($slotClick->parkingSlot); */
-
-                /* Availability the Slot Front */
-                /* $slotFront->availability_status = 0;
-                $slotFront->push(); */
-
-               /*  $slotFront->parkingSlot->slot_id = --$id;
-                $slotFront->push(); */
-
-
-
-
-                /* $slotFrontChange = Slot::where('id', $id)->first();
-                $slotFrontChange->availability_status = 1; */
-                
                 return true;
             }
         } 
@@ -231,8 +213,6 @@ class ParkingApiController extends Controller
             ->where('paid_status', 0)
             ->first();
 
-        // dd($parking);
-
         /* Calculate Time and Amount*/
         $calTime = new CalculateTimeController(
             $parking->in_time, 
@@ -246,24 +226,18 @@ class ParkingApiController extends Controller
         $parking->total_time = $calTime->timeOccupied();
         $parking->earned_amount = $calTime->rate;
         $parking->paid_status = 1;
-        // $parking->slot_id = ;
         
         /* Check Blocked or Not */
         $this->checkBlockedMove($request->id);
         
         $parking->save();
 
-        // $parking->with(['vehicle', 'customer']);
-
-        /* Released Slot */
-        /* $parking->slot->availability_status = 0;
-        $parking->slot->save(); */
-
         if ($parking && $parking->slot) {
             $message = [
                 'status'    => 1,
                 'message'   => 'Slot released...',
-                'parking'   => $parking
+                'parking'   => $parking,
+                'percentage' => $calTime->percentageDiscount
             ];
 
             $statusResponse = 200;
@@ -277,21 +251,5 @@ class ParkingApiController extends Controller
         }
         
         return response()->json($message, $statusResponse);
-    }
-
-    public function dataSlot(Request $request)
-    {
-        $dataSlot = Parking::select([
-            'customers.name',
-            'customers.documentId',
-            'vehicles.plate',
-            ])
-            ->where('slot_id', $request->id)
-            ->where('paid_status', 0)
-            ->join('vehicles', 'parkings.vehicle_id', '=', 'vehicles.id')
-            ->join('customers', 'parkings.customer_id', '=', 'customers.id')
-            ->get();
-
-        return response()->json($dataSlot, 200);
     }
 }
