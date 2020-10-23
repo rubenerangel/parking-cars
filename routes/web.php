@@ -20,3 +20,9 @@ Route::get('/', function () {
 
 Route::resource('/discounts', 'DiscountController');
 
+Route::get('/reports', function() {
+    return view('reportSlot');
+});
+
+Route::post('/reports', 'ReportController@index');
+

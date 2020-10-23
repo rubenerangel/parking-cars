@@ -1951,7 +1951,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _TypeVehicle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./TypeVehicle */ "./resources/js/components/TypeVehicle.vue");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -2104,7 +2103,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2186,7 +2185,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               case 3:
                 parkingForm = document.getElementById('parking_form');
                 formData = new FormData(parkingForm);
-                formData.append('rate_id', 1);
+                formData.append('rate_id', _this2.selectedSlotRateId);
 
                 if (!_this2.selectedSlotId) {
                   formData.append('slot_id', _this2.slotsNotBusy[0].id);
@@ -2246,6 +2245,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     selectedSlotType: function selectedSlotType(state) {
       return state.slots.selectedSlotType;
+    },
+    selectedSlotRateId: function selectedSlotRateId(state) {
+      return state.slots.selectedSlotRateId;
     },
     typeSelectec: function typeSelectec() {
       return this.slotWayChange(this.selectedSlotType);
@@ -2765,55 +2767,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     upperCase: function upperCase(value) {
       if (!value) return '';
       return value.toUpperCase();
-    }
-  }
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TypeVehicle.vue?vue&type=script&lang=js&":
-/*!**********************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TypeVehicle.vue?vue&type=script&lang=js& ***!
-  \**********************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'TypeVehicle',
-  data: function data() {
-    return {
-      typeVehicles: '',
-      vehicles: []
-    };
-  },
-  mounted: function mounted() {
-    this.allTypeVehicles();
-  },
-  methods: {
-    allTypeVehicles: function allTypeVehicles() {
-      var _this = this;
-
-      axios.get('/vehicles').then(function (resp) {
-        _this.vehicles = resp.data.data;
-      });
-    },
-    asignSlot: function asignSlot(e) {
-      e.preventDefault();
-      console.log('clikc');
-
-      if (!this.typeVehicles) {
-        alert('Seleccionar el Tipo de vehículo');
-      }
     }
   }
 });
@@ -64572,7 +64525,12 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control form-control-sm",
-                    attrs: { type: "text", id: "plate", name: "plate" },
+                    attrs: {
+                      type: "text",
+                      id: "plate",
+                      name: "plate",
+                      maxlength: "7"
+                    },
                     domProps: { value: _vm.plate },
                     on: {
                       input: function($event) {
@@ -65406,30 +65364,6 @@ var staticRenderFns = [
     ])
   }
 ]
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TypeVehicle.vue?vue&type=template&id=36464477&scoped=true&":
-/*!**************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TypeVehicle.vue?vue&type=template&id=36464477&scoped=true& ***!
-  \**************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div")
-}
-var staticRenderFns = []
 render._withStripped = true
 
 
@@ -79294,75 +79228,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/TypeVehicle.vue":
-/*!*************************************************!*\
-  !*** ./resources/js/components/TypeVehicle.vue ***!
-  \*************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _TypeVehicle_vue_vue_type_template_id_36464477_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TypeVehicle.vue?vue&type=template&id=36464477&scoped=true& */ "./resources/js/components/TypeVehicle.vue?vue&type=template&id=36464477&scoped=true&");
-/* harmony import */ var _TypeVehicle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TypeVehicle.vue?vue&type=script&lang=js& */ "./resources/js/components/TypeVehicle.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
-
-
-
-
-/* normalize component */
-
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _TypeVehicle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _TypeVehicle_vue_vue_type_template_id_36464477_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _TypeVehicle_vue_vue_type_template_id_36464477_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
-  false,
-  null,
-  "36464477",
-  null
-  
-)
-
-/* hot reload */
-if (false) { var api; }
-component.options.__file = "resources/js/components/TypeVehicle.vue"
-/* harmony default export */ __webpack_exports__["default"] = (component.exports);
-
-/***/ }),
-
-/***/ "./resources/js/components/TypeVehicle.vue?vue&type=script&lang=js&":
-/*!**************************************************************************!*\
-  !*** ./resources/js/components/TypeVehicle.vue?vue&type=script&lang=js& ***!
-  \**************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TypeVehicle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./TypeVehicle.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TypeVehicle.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TypeVehicle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
-
-/***/ }),
-
-/***/ "./resources/js/components/TypeVehicle.vue?vue&type=template&id=36464477&scoped=true&":
-/*!********************************************************************************************!*\
-  !*** ./resources/js/components/TypeVehicle.vue?vue&type=template&id=36464477&scoped=true& ***!
-  \********************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TypeVehicle_vue_vue_type_template_id_36464477_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./TypeVehicle.vue?vue&type=template&id=36464477&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TypeVehicle.vue?vue&type=template&id=36464477&scoped=true&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TypeVehicle_vue_vue_type_template_id_36464477_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TypeVehicle_vue_vue_type_template_id_36464477_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
-
-
-
-/***/ }),
-
 /***/ "./resources/js/store/index.js":
 /*!*************************************!*\
   !*** ./resources/js/store/index.js ***!
@@ -79414,7 +79279,8 @@ var slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    selectedSlotType: null
+    selectedSlotType: null,
+    selectedSlotRateId: null
   },
   getters: {
     carsSlotsBack: function carsSlotsBack(state) {
@@ -79463,6 +79329,7 @@ var slots = {
       state.selectedSlotType = payLoad.type_vehicle_id;
       state.selectedSlotId = payLoad.id;
       state.selectedSlotName = payLoad.name;
+      state.selectedSlotRateId = payLoad.rate.id;
     },
     INPUTSELECTTYPESLOT: function INPUTSELECTTYPESLOT(state, payLoad) {
       state.selectedSlotType = payLoad;
@@ -79507,7 +79374,10 @@ var slots = {
       var reset = {
         id: null,
         name: null,
-        type_vehicle_id: null
+        type_vehicle_id: null,
+        rate: {
+          id: null
+        }
       };
       commit('SELECTEDSLOT', reset);
     }

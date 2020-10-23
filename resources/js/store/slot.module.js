@@ -4,7 +4,8 @@ const slots = {
     slotsParking: [],
     selectedSlotName: null,
     selectedSlotId: null,
-    selectedSlotType: null
+    selectedSlotType: null,
+    selectedSlotRateId: null
   },
   getters: {
     carsSlotsBack: state => {
@@ -37,6 +38,7 @@ const slots = {
       state.selectedSlotType  = payLoad.type_vehicle_id
       state.selectedSlotId    = payLoad.id
       state.selectedSlotName  = payLoad.name
+      state.selectedSlotRateId  = payLoad.rate.id
     },
     INPUTSELECTTYPESLOT(state, payLoad) {
       state.selectedSlotType = payLoad
@@ -61,7 +63,10 @@ const slots = {
       const reset = {
         id: null,
         name: null,
-        type_vehicle_id: null
+        type_vehicle_id: null,
+        rate: {
+          id: null
+        }
       }
       commit('SELECTEDSLOT', reset)
     }
