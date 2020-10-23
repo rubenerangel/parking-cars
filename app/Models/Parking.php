@@ -45,7 +45,7 @@ class Parking extends Model
 
     public function rate()
     {
-        return $this->belongsTo('App\Models\Rate');
+        return $this->hasOne('App\Models\Rate', 'id', 'rate_id');
     }
 
     public function vehicle()

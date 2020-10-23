@@ -29,4 +29,9 @@ class Rate extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function parking()
+    {
+        return $this->hasMany('App\Models\Parking', 'rate_id', 'id');
+    }
 }

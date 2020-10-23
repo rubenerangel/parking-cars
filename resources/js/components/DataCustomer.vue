@@ -90,6 +90,7 @@
                       id="plate" 
                       name="plate"
                       v-model="plate"
+                      maxlength="7"
                     >
                   </div>
                 </div>
@@ -142,7 +143,6 @@
 import Swal from 'sweetalert2'
 import { mapState, mapGetters, mapActions } from 'vuex'
 
-import TypeVehicle from './TypeVehicle'
 export default {
   name: 'DataCustomer',
   data() {
@@ -210,7 +210,7 @@ export default {
       let parkingForm = document.getElementById('parking_form')
       let formData = new FormData(parkingForm)
 
-      formData.append('rate_id', 1)
+      formData.append('rate_id', this.selectedSlotRateId)
       if (!this.selectedSlotId) {
         formData.append('slot_id', this.slotsNotBusy[0].id)
       } else {
@@ -261,6 +261,7 @@ export default {
       selectedSlotName: state => state.slots.selectedSlotName,
       selectedSlotId: state => state.slots.selectedSlotId,
       selectedSlotType: state => state.slots.selectedSlotType,
+      selectedSlotRateId: state => state.slots.selectedSlotRateId,
       typeSelectec() {
         return this.slotWayChange(this.selectedSlotType)
       }

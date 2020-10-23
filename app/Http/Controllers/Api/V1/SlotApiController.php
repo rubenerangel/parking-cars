@@ -20,7 +20,7 @@ class SlotApiController extends Controller
 
         //  dd(Slot::with('parking')->get()); 
         
-        return new SlotResource(Slot::with('parking')->get());
+        return new SlotResource(Slot::with(['parking', 'rate'])->get());
     }
 
     /**

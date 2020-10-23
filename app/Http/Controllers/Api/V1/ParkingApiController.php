@@ -188,8 +188,6 @@ class ParkingApiController extends Controller
                 $slotFront->availability_status = 0;
                 $slotFront->push();
 
-                // dd($slotClick->parkingSlot);
-                
                 $slotFront->parkingSlot->slot_id = $id;
                 $slotFront->push();
                 
@@ -207,7 +205,8 @@ class ParkingApiController extends Controller
             [
                 'slot', 
                 'vehicle', 
-                'customer'
+                'customer',
+                'rate'
             ])
             ->where('slot_id', $request->id)
             ->where('paid_status', 0)

@@ -46,14 +46,8 @@ class Slot extends Model
             ->where('paid_status', 0);
     }
 
-    public function dataVehicle()
+    public function rate()
     {
-        return $this->hasOneThrough(
-            'App\Models\Vehicle', 
-            'App\Models\Parking',
-            'vehicle_id',
-            'id',
-            'id'
-        ) ;
+        return $this->hasOne('App\Models\Rate', 'type_vehicle_id', 'type_vehicle_id');
     }
 }
