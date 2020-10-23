@@ -8,6 +8,7 @@
           <thead>
             <tr>
               <th>ID</th>
+              <th>Nombre</th>
               <th>Cantidad</th>
             </tr>
           </thead>
@@ -15,6 +16,7 @@
             @foreach ($moreUsed as $slot)
               <tr>
                 <td>{{ $slot->slot_id }}</td>
+                <td>{{ $slot->name }}</td>
                 <td>{{ $slot->more_used }}</td>
               </tr>
             @endforeach

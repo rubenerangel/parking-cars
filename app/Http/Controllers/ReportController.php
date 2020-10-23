@@ -44,8 +44,13 @@ class ReportController extends Controller
     public function moreUsed($from, $until)
     {
         $parkingMoreUsed = Parking::select(
-                DB::raw ('slot_id, COUNT(*) AS more_used') 
+                DB::raw (
+                    'parkings.slot_id, 
+                    COUNT(*) AS more_used,
+                    slots.name'
+                ) 
             )
+            ->join('slots', 'slots.id', '=', 'parkings.slot_id')
             ->whereBetween('in_time', [$from . ' 00:00:00', $until . ' 23:59:59'])
             ->groupBy('slot_id')
             ->orderBy('more_used', 'DESC')
