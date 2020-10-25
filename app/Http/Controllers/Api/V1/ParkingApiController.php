@@ -11,6 +11,7 @@ use App\Models\Vehicle;
 use App\Models\Slot;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Api\V1\CalculateTimeController;
+use Illuminate\Support\Facades\DB;
 
 class ParkingApiController extends Controller
 {
@@ -266,5 +267,32 @@ class ParkingApiController extends Controller
         }
         
         return response()->json($message, $statusResponse);
+    }
+
+    public function validatePlate(Request $request)
+    {
+        $plate = Vehicle::select(
+            DB::raw('slots.name')
+        )
+        ->join('parkings', 'parkings.vehicle_id', '=', 'vehicles.id')
+        ->join('slots', 'parkings.slot_id', '=', 'slots.id')
+        ->where('vehicles.plate', 'like', $request->plate)
+        ->where('parkings.paid_status', 0)
+        ->first();
+
+        if (!empty($plate) && $plate->count() > 0) {
+            $message = [
+                'status' => 0,
+                'slot'   => $plate->name
+            ];
+            $status = 200;
+        } else {
+            $message = [
+                'status' => 1
+            ];
+            $status = 200;
+        }
+
+        return response()->json($message, $status);
     }
 }

@@ -28,5 +28,7 @@ Route::group(['prefix' => 'v1'], function() {
     Route::post( 'empty-slot', 'ParkingApiController@emptySlot' );
 
     Route::post( 'data', 'ParkingApiController@dataSlot' );
+
+    Route::post( 'plate-validate', 'ParkingApiController@validatePlate' );
 });
 

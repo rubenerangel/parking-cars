@@ -91,8 +91,27 @@
                       name="plate"
                       v-model="plate"
                       maxlength="7"
+                      @blur="validatePlate()"
+                      ref="plate"
                     >
                   </div>
+                </div>
+
+                <div class="row" v-if="isInSlot && isInSlot!== 1">
+                  <small class="text-danger col offset-4">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                    </svg>
+                    Ya esta ubicado en el Puesto <strong>{{ isInSlot }}</strong></small>
+                </div>
+
+                <div class="row" v-if="isInSlot === 1">
+                  <small class="text-success col offset-4">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                    Correcto
+                  </small>
                 </div>
 
                 <div class="row" v-if="error && error.plate">
@@ -128,7 +147,12 @@
                 </div>
 
                 <div class="row mt-3">
-                  <button class="btn btn-success btn-sm mx-auto" @click="asignSlot($event)">Asignar</button>
+                  <button 
+                    class="btn btn-success btn-sm mx-auto" 
+                    @click="asignSlot($event)"
+                    ref="btnAssign"
+                    :disabled="toggleDisable"
+                  >Asignar</button>
                 </div>
               
             </div>
@@ -158,7 +182,10 @@ export default {
         typeVehicle: null,
         plate: null,
         model: null
-      }
+      },
+      isInSlot: null,
+      validPlateStatus: null,
+      disabledBtn: false
     }
   },
   mounted () {
@@ -171,7 +198,29 @@ export default {
       'resetSelected',
       'inputSelectTypeSlot',
     ]),
-    
+    async validatePlate() {
+      this.isInSlot = null
+      await axios.post('/plate-validate', {plate: this.plate})
+        .then(resp => {
+          if (resp.data.status === 0) {
+            this.isInSlot = resp.data.slot
+            this.validPlateStatus = resp.data.status // 0
+            this.disabledBtn = true
+
+            this.$refs.plate.focus()
+            this.$refs.btnAssign.disabled
+
+            return false
+          } else if (resp.data.status === 1) {
+            this.isInSlot = 1
+
+            this.validPlateStatus = resp.data.status // 1
+            this.disabledBtn = false
+
+            return false
+          }
+        })
+    },
     allTypeVehicles() {
       axios.get('/vehicles')
         .then(resp => {
@@ -269,7 +318,10 @@ export default {
     ...mapGetters('slots', {
       slotsNotBusy :'slotsNotBusy',
       slotWayChange: 'slotWayChange'
-    })
+    }),
+    toggleDisable() {
+      return this.disabledBtn
+    }
   }, 
 }
 </script>

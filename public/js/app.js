@@ -2104,6 +2104,30 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2121,18 +2145,61 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         typeVehicle: null,
         plate: null,
         model: null
-      }
+      },
+      isInSlot: null,
+      validPlateStatus: null,
+      disabledBtn: false
     };
   },
   mounted: function mounted() {
     this.allTypeVehicles();
   },
   methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapActions"])('slots', ['allSlots', 'selectSlot', 'resetSelected', 'inputSelectTypeSlot'])), {}, {
-    allTypeVehicles: function allTypeVehicles() {
+    validatePlate: function validatePlate() {
       var _this = this;
 
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _this.isInSlot = null;
+                _context.next = 3;
+                return axios.post('/plate-validate', {
+                  plate: _this.plate
+                }).then(function (resp) {
+                  if (resp.data.status === 0) {
+                    _this.isInSlot = resp.data.slot;
+                    _this.validPlateStatus = resp.data.status; // 0
+
+                    _this.disabledBtn = true;
+
+                    _this.$refs.plate.focus();
+
+                    _this.$refs.btnAssign.disabled;
+                    return false;
+                  } else if (resp.data.status === 1) {
+                    _this.isInSlot = 1;
+                    _this.validPlateStatus = resp.data.status; // 1
+
+                    _this.disabledBtn = false;
+                    return false;
+                  }
+                });
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    allTypeVehicles: function allTypeVehicles() {
+      var _this2 = this;
+
       axios.get('/vehicles').then(function (resp) {
-        _this.vehicles = resp.data.data;
+        _this2.vehicles = resp.data.data;
       });
     },
     validateForm: function validateForm() {
@@ -2165,43 +2232,43 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     asignSlot: function asignSlot(e) {
-      var _this2 = this;
+      var _this3 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
         var parkingForm, formData;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 e.preventDefault();
 
-                if (_this2.validateForm()) {
-                  _context.next = 3;
+                if (_this3.validateForm()) {
+                  _context2.next = 3;
                   break;
                 }
 
-                return _context.abrupt("return", false);
+                return _context2.abrupt("return", false);
 
               case 3:
                 parkingForm = document.getElementById('parking_form');
                 formData = new FormData(parkingForm);
-                formData.append('rate_id', _this2.selectedSlotRateId);
+                formData.append('rate_id', _this3.selectedSlotRateId);
 
-                if (!_this2.selectedSlotId) {
-                  formData.append('slot_id', _this2.slotsNotBusy[0].id);
+                if (!_this3.selectedSlotId) {
+                  formData.append('slot_id', _this3.slotsNotBusy[0].id);
                 } else {
-                  formData.append('slot_id', _this2.selectedSlotId);
+                  formData.append('slot_id', _this3.selectedSlotId);
                 }
 
-                formData.append('in_time', _this2.inTime());
-                _context.next = 10;
+                formData.append('in_time', _this3.inTime());
+                _context2.next = 10;
                 return axios.post('/parking', formData).then(function (resp) {
                   if (resp.data.status) {
-                    _this2.resetData();
+                    _this3.resetData();
 
-                    _this2.resetSelected();
+                    _this3.resetSelected();
 
-                    _this2.allSlots();
+                    _this3.allSlots();
 
                     sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Slot Asignado!', 'Genial', 'success');
                   }
@@ -2211,10 +2278,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 10:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee);
+        }, _callee2);
       }))();
     },
     inTime: function inTime() {
@@ -2236,7 +2303,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     }
   }),
-  computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapState"])({
+  computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapState"])({
     selectedSlotName: function selectedSlotName(state) {
       return state.slots.selectedSlotName;
     },
@@ -2255,7 +2322,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   })), Object(vuex__WEBPACK_IMPORTED_MODULE_2__["mapGetters"])('slots', {
     slotsNotBusy: 'slotsNotBusy',
     slotWayChange: 'slotWayChange'
-  }))
+  })), {}, {
+    toggleDisable: function toggleDisable() {
+      return this.disabledBtn;
+    }
+  })
 });
 
 /***/ }),
@@ -64524,6 +64595,7 @@ var render = function() {
                         expression: "plate"
                       }
                     ],
+                    ref: "plate",
                     staticClass: "form-control form-control-sm",
                     attrs: {
                       type: "text",
@@ -64533,6 +64605,9 @@ var render = function() {
                     },
                     domProps: { value: _vm.plate },
                     on: {
+                      blur: function($event) {
+                        return _vm.validatePlate()
+                      },
                       input: function($event) {
                         if ($event.target.composing) {
                           return
@@ -64543,6 +64618,69 @@ var render = function() {
                   })
                 ])
               ]),
+              _vm._v(" "),
+              _vm.isInSlot && _vm.isInSlot !== 1
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "text-danger col offset-4" }, [
+                      _c(
+                        "svg",
+                        {
+                          staticClass: "bi bi-x-circle-fill",
+                          attrs: {
+                            width: "1em",
+                            height: "1em",
+                            viewBox: "0 0 16 16",
+                            fill: "currentColor",
+                            xmlns: "http://www.w3.org/2000/svg"
+                          }
+                        },
+                        [
+                          _c("path", {
+                            attrs: {
+                              "fill-rule": "evenodd",
+                              d:
+                                "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
+                            }
+                          })
+                        ]
+                      ),
+                      _vm._v(
+                        "\n                  Ya esta ubicado en el Puesto "
+                      ),
+                      _c("strong", [_vm._v(_vm._s(_vm.isInSlot))])
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.isInSlot === 1
+                ? _c("div", { staticClass: "row" }, [
+                    _c("small", { staticClass: "text-success col offset-4" }, [
+                      _c(
+                        "svg",
+                        {
+                          staticClass: "bi bi-check-circle-fill",
+                          attrs: {
+                            width: "1em",
+                            height: "1em",
+                            viewBox: "0 0 16 16",
+                            fill: "currentColor",
+                            xmlns: "http://www.w3.org/2000/svg"
+                          }
+                        },
+                        [
+                          _c("path", {
+                            attrs: {
+                              "fill-rule": "evenodd",
+                              d:
+                                "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"
+                            }
+                          })
+                        ]
+                      ),
+                      _vm._v("\n                  Correcto\n                ")
+                    ])
+                  ])
+                : _vm._e(),
               _vm._v(" "),
               _vm.error && _vm.error.plate
                 ? _c("div", { staticClass: "row" }, [
@@ -64592,7 +64730,9 @@ var render = function() {
                 _c(
                   "button",
                   {
+                    ref: "btnAssign",
                     staticClass: "btn btn-success btn-sm mx-auto",
+                    attrs: { disabled: _vm.toggleDisable },
                     on: {
                       click: function($event) {
                         return _vm.asignSlot($event)
