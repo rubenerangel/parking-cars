@@ -37,7 +37,7 @@ class Slot extends Model
         return $this->hasOne('App\Models\Parking')
             ->join('vehicles', 'parkings.vehicle_id', '=', 'vehicles.id')
             ->join('customers', 'parkings.customer_id', '=', 'customers.id')
-            ->where('paid_status', 0);
+            ->where('parkings.paid_status', '=', 0);
     }
 
     public function parkingSlot()

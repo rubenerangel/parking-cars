@@ -193,14 +193,20 @@ class ParkingApiController extends Controller
                 
                 return true;
             }
-        } 
+        } else {
+            $slot = Slot::find($id);
+
+            $slot->availability_status = 0;
+            $slot->save();
+        }
+
+
 
         return true;
     }
 
     public function emptySlot(Request $request)
     {
-        
         $parking = Parking::with(
             [
                 'slot', 
