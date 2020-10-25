@@ -219,7 +219,7 @@ export default {
 
             return false
           }
-        })
+        }) 
     },
     allTypeVehicles() {
       axios.get('/vehicles')
