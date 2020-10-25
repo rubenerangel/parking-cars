@@ -169,7 +169,7 @@ class ParkingApiController extends Controller
                 ->where('type_vehicle_id', $slotFront->type_vehicle_id)
                 ->first();
 
-            if (!empty($slotFree->id)) {  // Board Not is full  
+            if (!empty($slotFree->id)) {  // Board is Not full  
                 /* Change Id Slot in Parkings */
                 $slotFront->parkingSlot->slot_id = $slotFree->id;
                 $slotFront->push();
@@ -182,6 +182,8 @@ class ParkingApiController extends Controller
                 $slotFree->availability_status = 1;
                 $slotFree->save();
 
+                $this->slotClickedReleased($id);
+
                 return true;
             } else { // Board Is full
                 /* Availability the Slot Front */
@@ -190,6 +192,8 @@ class ParkingApiController extends Controller
 
                 $slotFront->parkingSlot->slot_id = $id;
                 $slotFront->push();
+
+                $this->slotClickedReleased($id);
                 
                 return true;
             }
@@ -200,9 +204,15 @@ class ParkingApiController extends Controller
             $slot->save();
         }
 
-
-
         return true;
+    }
+
+    public function slotClickedReleased($id)
+    {
+        /* Slot Clicked */
+        $slot = Slot::find($id);
+        $slot->availability_status = 0;
+        $slot->save();
     }
 
     public function emptySlot(Request $request)
