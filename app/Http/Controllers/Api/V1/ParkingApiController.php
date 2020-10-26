@@ -271,6 +271,11 @@ class ParkingApiController extends Controller
 
     public function validatePlate(Request $request)
     {
+        /* validate get Data */
+        $validatePlate = $request->validate([
+            'plate' => 'required',
+        ]);
+        
         $plate = Vehicle::select(
             DB::raw('slots.name')
         )

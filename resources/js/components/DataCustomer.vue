@@ -15,6 +15,7 @@
                       id="documentId" 
                       name="documentId"
                       v-model="documentId"
+                      ref="documentId"
                     >
                   </div>
                 </div>
@@ -24,7 +25,9 @@
                 </div>
                 
                 <div class="form-group row mb-0 mt-2">
-                  <label for="staticEmail" class="col-4 text-right col-form-label pb-0">Nombre:<sup class="text-danger">*</sup></label>
+                  <label for="staticEmail" class="col-4 text-right col-form-label pb-0">
+                    Nombre:<sup class="text-danger">*</sup>
+                  </label>
                   <div class="col">
                     <input 
                       type="text" 
@@ -32,6 +35,7 @@
                       id="name" 
                       name="name"
                       v-model="name"
+                      ref="name"
                     >
                   </div>
                 </div>
@@ -190,6 +194,7 @@ export default {
   },
   mounted () {
     this.allTypeVehicles();
+    this.$refs.documentId.focus()
   },
   methods: {
     ...mapActions('slots', [
@@ -200,26 +205,29 @@ export default {
     ]),
     async validatePlate() {
       this.isInSlot = null
-      await axios.post('/plate-validate', {plate: this.plate})
-        .then(resp => {
-          if (resp.data.status === 0) {
-            this.isInSlot = resp.data.slot
-            this.validPlateStatus = resp.data.status // 0
-            this.disabledBtn = true
 
-            this.$refs.plate.focus()
-            this.$refs.btnAssign.disabled
-
-            return false
-          } else if (resp.data.status === 1) {
-            this.isInSlot = 1
-
-            this.validPlateStatus = resp.data.status // 1
-            this.disabledBtn = false
-
-            return false
-          }
-        }) 
+      if (this.plate !== null) {
+        await axios.post('/plate-validate', {plate: this.plate})
+          .then(resp => {
+            if (resp.data.status === 0) {
+              this.isInSlot = resp.data.slot
+              this.validPlateStatus = resp.data.status // 0
+              this.disabledBtn = true
+  
+              this.$refs.plate.focus()
+              this.$refs.btnAssign.disabled
+  
+              return false
+            } else if (resp.data.status === 1) {
+              this.isInSlot = 1
+  
+              this.validPlateStatus = resp.data.status // 1
+              this.disabledBtn = false
+  
+              return false
+            }
+          }) 
+      }
     },
     allTypeVehicles() {
       axios.get('/vehicles')
@@ -295,13 +303,24 @@ export default {
       this.model = null
       this.name = null
       this.error = {}
+      this.isInSlot = null
+      this.validPlateStatus = null
+      this.disabledBtn = false
     },
     selectTypeVehicleChange() {
       if (this.selectedSlotType) {
-        let randomSlot = this.typeSelectec[Math.floor(Math.random() * this.typeSelectec.length)];
-        this.selectSlot(randomSlot)
-
-        EventBus.$emit('selSlot', randomSlot)
+        if ( this.typeSelectec.length > 0 ) {
+          let randomSlot = this.typeSelectec[Math.floor(Math.random() * this.typeSelectec.length)];
+          this.selectSlot(randomSlot)
+  
+          EventBus.$emit('selSlot', randomSlot)
+        } else {
+          Swal.fire(
+            'No hay puesto disponible!',
+            'Verifica',
+            'warning'
+          )
+        }
       }
     }
   },
