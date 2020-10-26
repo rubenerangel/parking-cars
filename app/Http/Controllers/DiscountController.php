@@ -49,7 +49,9 @@ class DiscountController extends Controller
      */
     public function show($id)
     {
-        //
+        $reduction = Reduction::find($id);
+
+        return view('partials.discounts.showEdit', compact('reduction'));
     }
 
     /**
@@ -72,7 +74,26 @@ class DiscountController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // dd($request->all());
+        /* validate get Data */
+        $validateReduction = $request->validate([
+            'name'       => 'required',
+            'percentage' => 'required',
+            'time'       => 'required',
+        ]);
+
+        $reduction = Reduction::find($id);
+
+        $reduction->name = $request->name;
+        $reduction->percentage = $request->percentage;
+        $reduction->time = $request->time;
+        $reduction->active = isset($request->active) ? 1 : 0;
+        
+        $reduction->save();
+        
+        $message = 'Descuento actualizado correctamente';
+
+        return view('partials.discounts.showEdit', compact(['message', 'reduction']));
     }
 
     /**
@@ -83,6 +104,9 @@ class DiscountController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $reductions = Reduction::find($id);
+        // $discount->delete();
+
+        return $this->index();
     }
 }
