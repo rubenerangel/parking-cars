@@ -244,6 +244,10 @@ export default {
     EventBus.$on('selSlot', slot => {
       this.slotSelect(slot)
     })
+
+    EventBus.$on('clearSel', () => {
+      this.clearSelected()
+    })
   },
   methods: {
     ...mapActions('slots', [
@@ -257,6 +261,12 @@ export default {
         .then(resp => {
           return resp.data.data[0].name
         })
+    },
+    clearSelected() {
+      const slotPreSelected = document.querySelector(`.selected`)
+      
+      slotPreSelected.classList.remove('selected')
+      slotPreSelected.classList.add('not-busy')
     },
     slotSelect(slot) {
       // Validate element exists whit class no-busy

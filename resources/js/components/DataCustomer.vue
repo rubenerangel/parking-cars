@@ -320,6 +320,8 @@ export default {
             'Verifica',
             'warning'
           )
+          
+          EventBus.$emit('clearSel')
         }
       }
     }
